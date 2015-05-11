@@ -13,6 +13,8 @@
 <?php
     require_once('install_config.php');
 
+    $INSTALLED_CONF = array();
+
     // Check database connection
     $db_info = $INSTALL_CONFIG["DATABASE"];
     $conn = new mysqli($db_info["host"], $db_info["user"], $db_info["password"], $db_info["database"]);
@@ -20,17 +22,19 @@
     if ($conn->connect_error)
         die("<h2>Database connection failed<br/>".$conn->connect_error);
 
+    $INSTALLED_CONF["DATABASE"] = $db_info;
 
-//      TODO TEST
-//    // Check libraries paths
-//    if(!file_exists($INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["bootstrap"]."css/bootstrap.min.css"))
-//        die("<h2>Bootstrap not found</h2> at path: ".$INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["bootstrap"]."css/bootstrap.min.css");
-//
-//    if(!file_exists($INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["bootstrap"]."js/bootstrap.min.js"))
-//        die("<h2>Bootstrap not found</h2> at path: ".$INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["bootstrap"]."js/bootstrap.min.js");
-//
-//    if(!file_exists($INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["jquery"]))
-//        die("<h2>JQuery not found</h2> at path: ".$INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["jquery"]);
+    // Check libraries paths
+    if(!file_exists($_SERVER["DOCUMENT_ROOT"].$INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["bootstrap"]."css/bootstrap.min.css"))
+        die("<h2>Bootstrap not found</h2> at path: ".$_SERVER["DOCUMENT_ROOT"].$INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["bootstrap"]."css/bootstrap.min.css");
+
+    if(!file_exists($_SERVER["DOCUMENT_ROOT"].$INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["bootstrap"]."js/bootstrap.min.js"))
+        die("<h2>Bootstrap not found</h2> at path: ".$_SERVER["DOCUMENT_ROOT"].$INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["bootstrap"]."js/bootstrap.min.js");
+
+    if(!file_exists($_SERVER["DOCUMENT_ROOT"].$INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["jquery"]))
+        die("<h2>JQuery not found</h2> at path: ".$_SERVER["DOCUMENT_ROOT"].$INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["jquery"]);
+
+    $INSTALLED_CONF['LIBRARIES_ABS_PATH'] = $INSTALL_CONFIG["LIBRARIES_ABS_PATH"];
 
     // Check if tables already exists
     foreach ($INSTALL_CONFIG["TABLES_DEFINITION"] as $key => $val) {
@@ -50,6 +54,13 @@
         if ($conn->connect_error)
             die("<h2>Tables creation failed<br/> <b>NOT HANDLED: You have to clean by your own.</b> <br/>".$conn->connect_error);
 
+        $INSTALLED_CONF["tables"][$key] = $db_info["table_prefix"].$key;
     }
+
+    //Store new config file
+    if(file_put_contents("../config.php", '<?php $CONF='.var_export($INSTALLED_CONF, true)) === false)
+        die('<h2>Failed to write config file</h2>NOT HANDLED: you have to clean db by your own');
+
+    die("<h2>Installation successful</h2> <a href='../'>Go to admin panel</a>");
 
 ?>

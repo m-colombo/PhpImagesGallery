@@ -20,9 +20,10 @@ $INSTALL_CONFIG = array(
     ),
 
 
+    //Path are relative to $_SERVER["DOCUMENT_ROOT"]
     "LIBRARIES_ABS_PATH" => array(
-        "bootstrap" =>  "", // Path to the root folder, ends with directory separator /
-        "jquery"    =>  ""  // Path to jquery file.
+        "bootstrap" =>  "/PIG/libs/bootstrap/", // Path to the bootstrap root folder, ends with directory separator /
+        "jquery"    =>  "/PIG/libs/jquery.min.js"  // Path to jquery file.
     ),
 
 
@@ -59,6 +60,7 @@ $INSTALL_CONFIG = array(
                 `image` int(11) NOT NULL,
                 `image_name` varchar(32) DEFAULT NULL,
                 `image_description` text,
+                `order` int(11) DEFAULT 0,
                 FOREIGN KEY (`album`) REFERENCES `__TABLE__PREFIX__pig_albums` (`id`) ON DELETE CASCADE,
                 FOREIGN KEY (`image`) REFERENCES `__TABLE__PREFIX__pig_images` (`id`) ON DELETE CASCADE
             )
