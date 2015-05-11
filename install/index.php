@@ -11,6 +11,11 @@
 <h1>Installation</h1>
 
 <?php
+
+    //Check if installation is needed
+    if(file_exists ("../config.php"))
+        die("<h2>Installation already done</h2> ../config.php already exists");
+
     require_once('install_config.php');
 
     $INSTALLED_CONF = array();
@@ -58,7 +63,7 @@
     }
 
     //Store new config file
-    if(file_put_contents("../config.php", '<?php $CONF='.var_export($INSTALLED_CONF, true)) === false)
+    if(file_put_contents("../config.php", '<?php $CONF='.var_export($INSTALLED_CONF, true)."; ?>") === false)
         die('<h2>Failed to write config file</h2>NOT HANDLED: you have to clean db by your own');
 
     die("<h2>Installation successful</h2> <a href='../'>Go to admin panel</a>");

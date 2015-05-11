@@ -14,4 +14,4 @@ if(!file_exists ("config.php")) {
     die('');
 }
 
-require_once "config.php";
+header("Location: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]/admin/index.php");
