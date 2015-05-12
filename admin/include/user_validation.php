@@ -7,16 +7,13 @@
  * License: MIT
  */
 
-//TODO could be done much better
-
 session_start();
-$_SESSION["PIG_USER"] = "admin"; //DEBUG
-
+$_SESSION["PIG_USER"] = "admin"; // TODO REMOVE, DEBUG
 
 //User validation
 if(array_key_exists("password", $_POST)){
-    if($_POST['password'] == "lol"){
-        $_SESSION["PIG_USER"] = "admin";    //TODO make set it in $CONF
+    if($_POST['password'] == $CONF["ADMIN_PASSWORD"]){  //TODO test
+        $_SESSION["PIG_USER"] = "admin";
     }else{
         echo "<h2>Invalid password</h2>";
     }

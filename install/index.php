@@ -62,6 +62,8 @@
         $INSTALLED_CONF["tables"][$key] = $db_info["table_prefix"].$key;
     }
 
+    $INSTALLED_CONF["ADMIN_PASSWORD"] = $INSTALL_CONFIG["ADMIN_PASSWORD"];
+
     //Store new config file
     if(file_put_contents("../config.php", '<?php $CONF='.var_export($INSTALLED_CONF, true)."; ?>") === false)
         die('<h2>Failed to write config file</h2>NOT HANDLED: you have to clean db by your own');

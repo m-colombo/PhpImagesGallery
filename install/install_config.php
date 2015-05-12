@@ -26,11 +26,13 @@ $INSTALL_CONFIG = array(
         "jquery"    =>  "/PIG/libs/jquery.min.js"  // Path to jquery file.
     ),
 
+    "ADMIN_PASSWORD" => "password",
+
 
     ###################################
     #   LEAVE WHAT FOLLOWS AS IT IS   #
     ###################################
-
+    //TODO test and implement visible attribute
     "TABLES_DEFINITION" => array(
         "pig_images"        => "
             (
@@ -51,6 +53,7 @@ $INSTALL_CONFIG = array(
                 `description` text NOT NULL,
                 `cover` int(11) DEFAULT NULL,
                 `order` int(11) DEFAULT 0,
+                `visible` BOOLEAN DEFAULT true,
                 FOREIGN KEY (`cover`) REFERENCES `__TABLE__PREFIX__pig_images` (`id`) ON DELETE SET NULL
             )",
 
@@ -61,6 +64,7 @@ $INSTALL_CONFIG = array(
                 `image_name` varchar(32) DEFAULT NULL,
                 `image_description` text,
                 `order` int(11) DEFAULT 0,
+                `visible` BOOLEAN DEFAULT true,
                 FOREIGN KEY (`album`) REFERENCES `__TABLE__PREFIX__pig_albums` (`id`) ON DELETE CASCADE,
                 FOREIGN KEY (`image`) REFERENCES `__TABLE__PREFIX__pig_images` (`id`) ON DELETE CASCADE
             )
