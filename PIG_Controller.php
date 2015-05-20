@@ -19,6 +19,7 @@ class PIG_Controller {
               "detail"    => string
          )
      */
+
     public $ERROR = null;
 
     function __construct(){
@@ -37,6 +38,7 @@ class PIG_Controller {
         );
     }
 
+    //TODO error handling?
     public function getAllAlbums(){
         global $CONF;
 
@@ -44,13 +46,31 @@ class PIG_Controller {
           FROM
               ".$CONF["tables"]["pig_albums"]." as A LEFT JOIN
               ".$CONF["tables"]["pig_images"]." as I ON I.id = A.cover
-          ORDER BY A.order");
+          ORDER BY A.weight");
 
         $ret = array();
 
         while($row = $result->fetch_assoc())
             $ret[] = $row;
 
+        return $ret;
+    }
+
+    public function createAlbum($name, $desc, $order){
+        global $CONF;
+        $ret = false;
+
+        $query = $this->db->prepare("INSERT INTO ".$CONF["tables"]["pig_albums"]." (name, description, weight) VALUES (?, ?, ?)");
+
+        $query->bind_param("ssi", $name, $desc, $order);
+
+        if($query->execute())
+            $ret = true;
+        else{
+            $this->setError("UNKNOWN", $query->error);
+        }
+
+        $query->close();
         return $ret;
     }
 }

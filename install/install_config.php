@@ -52,7 +52,7 @@ $INSTALL_CONFIG = array(
                 `name` varchar(32) NOT NULL UNIQUE,
                 `description` text NOT NULL,
                 `cover` int(11) DEFAULT NULL,
-                `order` int(11) DEFAULT 0,
+                `weight` int(11) DEFAULT 0,
                 `visible` BOOLEAN DEFAULT true,
                 FOREIGN KEY (`cover`) REFERENCES `__TABLE__PREFIX__pig_images` (`id`) ON DELETE SET NULL
             )",
@@ -63,7 +63,7 @@ $INSTALL_CONFIG = array(
                 `image` int(11) NOT NULL,
                 `image_name` varchar(32) DEFAULT NULL,
                 `image_description` text,
-                `order` int(11) DEFAULT 0,
+                `weight` int(11) DEFAULT 0,
                 `visible` BOOLEAN DEFAULT true,
                 FOREIGN KEY (`album`) REFERENCES `__TABLE__PREFIX__pig_albums` (`id`) ON DELETE CASCADE,
                 FOREIGN KEY (`image`) REFERENCES `__TABLE__PREFIX__pig_images` (`id`) ON DELETE CASCADE

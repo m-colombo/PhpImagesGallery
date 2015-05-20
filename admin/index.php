@@ -7,8 +7,18 @@
  * License: MIT
  */
 
+/**
+ * TODO
+ * Create barebone user class
+ * Make ready to implement nested albums (parent in album table)
+ */
+
 require_once("../config.php");
 require_once("include/user_validation.php");
+
+require_once("../PIG_Controller.php");
+$PIG = new PIG_Controller();
+$PIG->createAlbum("test", "test", 0);
 
 //Process page info
 $PAGE = array();
