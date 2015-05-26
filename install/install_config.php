@@ -39,9 +39,10 @@ $INSTALL_CONFIG = array(
                 `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 `create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 `name` varchar(32),
-                `url` varchar(128) NOT NULL,
+                `filename` varchar(128) NOT NULL,
                 `width` int(11),
-                `height` int(11)
+                `height` int(11),
+                `visible` BOOLEAN DEFAULT true
             )
         ",
 

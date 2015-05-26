@@ -36,7 +36,21 @@ if(array_key_exists("action", $_GET) && $_GET["action"] == "create"){
 
 <?php
     //CONTENT
-    var_dump($PIG->getAllAlbums());
+    $albums = $PIG->getAllAlbums();
+    foreach ($albums as $a) {
+        echo "<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'><a href='' class='thumbnail'>";
+            if(is_null($a["cover_filename"])){
+               echo "<img src='no-cover.jpg'>";
+            }else{
+                //TODO get the right url
+            }
+
+            echo "<h4>$a[name]</h4>";
+            echo "$a[description]";
+        echo "</a></div>";
+    }
+
+
 ?>
 
 

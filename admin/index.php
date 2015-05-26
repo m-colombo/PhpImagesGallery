@@ -18,7 +18,6 @@ require_once("include/user_validation.php");
 
 require_once("../PIG_Controller.php");
 $PIG = new PIG_Controller();
-$PIG->createAlbum("test", "test", 0);
 
 //Process page info
 $PAGE = array();
@@ -49,9 +48,7 @@ switch($_GET["p"]){
     <title><?php echo $PAGE["title"]; ?></title>
 
     <link href="<?php echo $CONF["LIBRARIES_ABS_PATH"]["bootstrap"]."css/bootstrap.min.css";?>" rel="stylesheet" />
-
     <link href="style.css" rel="stylesheet" />
-    <script src="script.js"></script>
 
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -81,6 +78,31 @@ switch($_GET["p"]){
 <!--    </div>-->
 
 </div>
+
+
+<!-- IMAGES UPLOAD MODAL -->
+<div class="modal fade"  id="modal-images-update" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Uploading images</h4>
+            </div>
+            <!-- TODO find a better way to scroll the modal -->
+            <div class="modal-body dropzone-previews" style="height: 500px; overflow-y: auto">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Upload</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <script src="<?php echo $CONF["LIBRARIES_ABS_PATH"]["jquery"]; ?>"></script>
 <script src="<?php echo $CONF["LIBRARIES_ABS_PATH"]["bootstrap"]."js/bootstrap.min.js" ;?>"></script>
+<script src="./include/dropzone/dropzone.min.js"></script>
+<script src="script.js"></script>
+
 </body>

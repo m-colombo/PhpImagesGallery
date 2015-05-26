@@ -38,15 +38,25 @@ class PIG_Controller {
         );
     }
 
-    //TODO error handling?
+    /**
+     * @return array|bool
+     * array:
+     *  id, create_date, name, description, cover_url (or null), cover_id (or null)
+     */
     public function getAllAlbums(){
         global $CONF;
 
-        $result = $this->db->query("SELECT A.id as id, A.create_date as create_date, A.name as name, A.description as description, I.url as cover_url, I.id as cover_id
+        $result = $this->db->query("SELECT A.id as id, A.create_date as create_date, A.name as name, A.description as description, I.filename as cover_filename, I.id as cover_id
           FROM
               ".$CONF["tables"]["pig_albums"]." as A LEFT JOIN
               ".$CONF["tables"]["pig_images"]." as I ON I.id = A.cover
           ORDER BY A.weight");
+
+
+        if(!$result){
+            $this->setError("UNKNOWN", $this->db->error);
+            return false;
+        }
 
         $ret = array();
 
