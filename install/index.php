@@ -63,6 +63,7 @@
     }
 
     $INSTALLED_CONF["ADMIN_PASSWORD"] = $INSTALL_CONFIG["ADMIN_PASSWORD"];
+    $INSTALLED_CONF["IMAGES_CONF"] = $INSTALL_CONFIG["IMAGES_CONF"];
 
     //Store new config file
     if(file_put_contents("../config.php", '<?php $CONF='.var_export($INSTALLED_CONF, true)."; ?>") === false)

@@ -19,20 +19,6 @@ if(array_key_exists("action", $_GET) && $_GET["action"] == "create"){
 }
 ?>
 
-<!-- HEADER -->
-<div style="position:fixed; z-index:10; right:0;" class="btn-group">
-    <button class="btn btn-default" data-toggle="modal" data-target="#modal_album_create"><span class="glyphicon glyphicon-plus"></span></button>
-    <a  class="btn btn-default" href="?p=settings"><span class="glyphicon glyphicon-cog"></span></a>
-</div>
-
-<div class="row">
-    <div class="col-xs-12">
-        <ol class="breadcrumb">
-            <li class="active">Albums</li>
-        </ol>
-    </div>
-</div>
-
 
 <?php
     //CONTENT

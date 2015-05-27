@@ -26,6 +26,13 @@ $INSTALL_CONFIG = array(
         "jquery"    =>  "/PIG/libs/jquery.min.js"  // Path to jquery file.
     ),
 
+    "IMAGES_CONF" => array(
+        "max_store_width" => 800,
+        "max_store_height" => 600,
+        "thumb_width"  => 100,
+        "thumb_height"  => 100
+    ),
+
     "ADMIN_PASSWORD" => "password",
 
 

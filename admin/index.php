@@ -58,6 +58,13 @@ switch($_GET["p"]){
 <![endif]-->
 </head>
 <body>
+
+<div id="header-bar">
+    <ol class="breadcrumb">
+        <li class="active">Albums</li>
+    </ol>
+</div>
+
 <div class="container">
 
     <!--
@@ -79,6 +86,15 @@ switch($_GET["p"]){
 
 </div>
 
+<div id="action-bottom-bar">
+
+    Drag images everywhere to upload
+    <div class="action-buttons pull-right btn-group">
+            <button class="btn btn-default" data-toggle="modal" data-target="#modal_album_create"><span class="glyphicon glyphicon-plus"></span> Add Album</button>
+<!--            <a  class="btn btn-default" href="?p=settings"><span class="glyphicon glyphicon-cog"></span></a>-->
+    </div>
+</div>
+
 
 <!-- IMAGES UPLOAD MODAL -->
 <div class="modal fade"  id="modal-images-update" >
@@ -89,7 +105,7 @@ switch($_GET["p"]){
                 <h4 class="modal-title">Uploading images</h4>
             </div>
             <!-- TODO find a better way to scroll the modal -->
-            <div class="modal-body dropzone-previews" style="height: 500px; overflow-y: auto">
+            <div class="modal-body dropzone-previews" style="height: 400px; overflow-y: auto">
 
             </div>
             <div class="modal-footer">

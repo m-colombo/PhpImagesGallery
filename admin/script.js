@@ -32,5 +32,6 @@ $("#modal-images-update .btn-primary").on('click', function (e) {
 })
 
 myDropzone.on("success", function(file, resp){
-    alert(resp);
+    $('body')[0].innerHTML = resp;
 });
+
