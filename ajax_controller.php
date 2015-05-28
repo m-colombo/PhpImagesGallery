@@ -8,52 +8,120 @@
  */
 
 require_once("config.php");
+require_once("PIG_controller.php");
 
-//TODO Check permission
+$db = new mysqli($CONF["DATABASE"]["host"], $CONF["DATABASE"]["user"], $CONF["DATABASE"]["password"], $CONF["DATABASE"]["database"]);
+if ($db->connect_error)
+    error("Database connection failed");
+
+$PIG = new PIG_Controller();
 
 if(array_key_exists("action", $_GET)){
     switch($_GET["action"]){
         case "upload-images":
             processImageFromFile($_FILES["file"]);
             break;
+        case "getAlbums":
+            getAlbums();
+            break;
+        default:
+            error("Invalid action");
     }
 }
 
 
-//TODO handle format different than Jpeg
 //TODO check permission
 //TODO error handling
-function processImageFromFile($tempFile){
-
-    /* Resize */
-    list($srcWidth, $srcHeight) = getimagesize($tempFile["tmp_name"]);
-
+function processImageFromFile($tempFile, $album = null)
+{
     global $CONF;
     $dstMaxWidth = $CONF["IMAGES_CONF"]["max_store_width"];
     $dstMaxHeight = $CONF["IMAGES_CONF"]["max_store_height"];
 
+    list($srcWidth, $srcHeight) = getimagesize($tempFile["tmp_name"]);
+
+    /* Resize */
     $scale = 1;
 
-    if($srcWidth > $dstMaxWidth)
+    if ($srcWidth > $dstMaxWidth)
         $scale = min($scale, $dstMaxWidth / $srcWidth);
 
-    if($srcHeight > $CONF["IMAGES_CONF"]["max_store_height"])
+    if ($srcHeight > $dstMaxHeight)
         $scale = min($scale, $dstMaxHeight / $srcHeight);
 
-    $dst   = imagecreatetruecolor($scale * $srcWidth, $scale * $srcHeight);
-    $source = imagecreatefromjpeg($tempFile["tmp_name"]);
-
-//    imagecopyresized($dst, $source, 0, 0, 0, 0, $scale * $srcWidth, $scale * $srcHeight, $srcWidth, $srcHeight);
-    imagesetinterpolation($source, IMG_BICUBIC);
-    imagecopyresampled($dst, $source, 0, 0, 0, 0, $scale * $srcWidth, $scale * $srcHeight, $srcWidth, $srcHeight);
-
-    imagejpeg($dst, "./images/".$tempFile["name"]);
-
-    //TODO verify name clashes
-    imagedestroy($dst);
-
-    //TODO create thumb
-    //TODO DB
+    $dstWidth = $scale * $srcWidth;
+    $dstHeight = $scale * $srcHeight;
+    $image = new Imagick($tempFile["tmp_name"]);
+    $image->resizeImage($dstWidth, $dstHeight, imagick::FILTER_LANCZOS, 0.9);
 
 
+    //TODO make it safer, concurrent call?
+    //Avoid name clashed
+    $dstName = $_FILES["file"]["name"];
+    $filename = preg_replace('/\\.[^.\\s]{3,4}$/', '', $_FILES["file"]["name"]);
+    $ext = $image->getImageFormat();
+
+    if (file_exists("./images/$dstName")) {
+        $counter = 1;
+        while (file_exists("./images/$filename-$counter.$ext"))
+            $counter++;
+        $dstName = "$filename-$counter.$ext";
+    }
+
+    $image->writeImage("./images/$dstName");
+
+
+    /* Thumb */
+    if($srcWidth>$srcHeight)
+        $image->thumbnailImage($CONF["IMAGES_CONF"]["thumb_width"], 0);
+    else
+        $image->thumbnailImage(0, $CONF["IMAGES_CONF"]["thumb_height"]);
+
+    $image->writeImage("./thumbnails/$dstName");
+    $image->destroy();
+
+
+    /* Database */  //TODO move into PIG_Controller
+    global $db;
+    $query = $db->prepare("INSERT INTO ".($CONF["tables"]["pig_images"])." (name, filename, width, height) VALUES(?, ?, ?, ?)");
+    $query->bind_param("ssii", $_FILES["file"]["name"], $dstName, $dstWidth, $dstHeight);
+
+    if(!$query->execute())
+        error("Database insert failed");
+
+    if(!is_null($album)){
+        $imageId = $query->insert_id;
+        $query->close();
+        $query = $db->prepare("INSERT INTO ".($CONF["tables"]["pig_album_images"])." (album, image, image_name) VALUES(?,?,?)");
+        $query->bind_param("iis", $album, $imageId, $_FILES["file"]["name"]);
+        if(!$query->execute())
+            error("Image insertion into album failed");
+    }
+    $query->close();
+
+}
+
+function getAlbums(){
+    global $PIG;
+    $ret = $PIG->getAllAlbums();
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+
+function success($response){
+    header('Content-Type: application/json');
+
+    die(json_encode($response));
+}
+
+function error($message="ERROR", $code=500){
+    header('Content-Type: application/json');
+    http_response_code($code);
+    die(json_encode(array(
+        "error" => $message
+    )));
 }

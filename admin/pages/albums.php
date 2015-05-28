@@ -7,7 +7,7 @@
  * License: MIT
  */
 
-require_once(dirname(__FILE__)."/../../PIG_Controller.php");
+require_once(dirname(__FILE__) . "/../../PIG_controller.php");
 $PIG = new PIG_Controller();
 
 //Handle POST Album creation
@@ -40,34 +40,3 @@ if(array_key_exists("action", $_GET) && $_GET["action"] == "create"){
 ?>
 
 
-<!-- CREATE ALBUM DIALOG-->
-<div class="modal fade" id="modal_album_create">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form class="form-horizontal" method="post" action="?p=album&action=create">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Create album</h4>
-            </div>
-            <div class="modal-body">
-                    <div class="form-group">
-                        <label for="albumTitle" class="col-sm-2 control-label">Title</label>
-                        <div class="col-sm-10">
-                            <input type="text" name="name" class="form-control" id="albumTitle" placeholder="Album name" maxlength="31">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="albumDesc" class="col-sm-2 control-label">Description</label>
-                        <div class="col-sm-10">
-                            <textarea class="form-control" id="albumDesc" name="description" placeholder="Album description" ></textarea>
-                        </div>
-                    </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <input type="submit" class="btn btn-primary"/>
-            </div>
-            </form>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->

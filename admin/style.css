@@ -55,6 +55,10 @@
 .dz-upload{
     width:0;
     height:1em;
-    background: green;
+    background: grey;
     display:inline-block;
+}
+
+.dz-error{
+    color:red;
 }

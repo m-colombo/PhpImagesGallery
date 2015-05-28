@@ -16,27 +16,6 @@
 require_once("../config.php");
 require_once("include/user_validation.php");
 
-require_once("../PIG_Controller.php");
-$PIG = new PIG_Controller();
-
-//Process page info
-$PAGE = array();
-
-if(!array_key_exists("p", $_GET))
-    $_GET["p"] = "";
-
-switch($_GET["p"]){
-    case "settings":
-        $PAGE["name"] = "settings";
-        $PAGE["title"] = "Settings - PIG";
-        $PAGE["include"] = "pages/settings.php";
-        break;
-    default:
-        $PAGE["name"] = "albums";
-        $PAGE["title"] = "Albums - PIG";
-        $PAGE["include"] = "pages/albums.php";
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -45,7 +24,7 @@ switch($_GET["p"]){
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><?php echo $PAGE["title"]; ?></title>
+    <title>PIG</title>
 
     <link href="<?php echo $CONF["LIBRARIES_ABS_PATH"]["bootstrap"]."css/bootstrap.min.css";?>" rel="stylesheet" />
     <link href="style.css" rel="stylesheet" />
@@ -61,22 +40,13 @@ switch($_GET["p"]){
 
 <div id="header-bar">
     <ol class="breadcrumb">
+        <li class=>PIG</li>
         <li class="active">Albums</li>
     </ol>
 </div>
 
-<div class="container">
+<div id="main-content" class="container">
 
-    <!--
-    <ul class="nav nav-tabs">
-        <li role="presentation" <?php if($PAGE["name"] == "albums")echo "class='active'"; ?>><a href="?p=albums">Browse</a></li>
-        <li role="presentation" <?php if($PAGE["name"] == "settings")echo "class='active'"; ?>><a href="?p=settings">Settings</a></li>
-    </ul>
-    -->
-
-    <?php
-        include $PAGE["include"];
-    ?>
 <!--    -->
 <!--    <div class="row">-->
 <!--        <div class="col-xs-12 col-sm-6 col-md-3">-->
@@ -112,6 +82,38 @@ switch($_GET["p"]){
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary">Upload</button>
             </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- CREATE ALBUM DIALOG-->
+<div class="modal fade" id="modal_album_create">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form class="form-horizontal" method="post" action="?p=album&action=create">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Create album</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="albumTitle" class="col-sm-2 control-label">Title</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="name" class="form-control" id="albumTitle" placeholder="Album name" maxlength="31">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="albumDesc" class="col-sm-2 control-label">Description</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" id="albumDesc" name="description" placeholder="Album description" ></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary"/>
+                </div>
+            </form>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
