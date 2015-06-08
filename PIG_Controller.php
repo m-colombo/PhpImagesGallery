@@ -45,6 +45,7 @@ class PIG_Controller {
      */
     public function getAllAlbums(){
         global $CONF;
+        $this->ERROR = null;
 
         $result = $this->db->query("SELECT A.id as id, A.create_date as create_date, A.name as name, A.description as description, I.filename as cover_filename, I.id as cover_id
           FROM
@@ -63,11 +64,21 @@ class PIG_Controller {
         while($row = $result->fetch_assoc())
             $ret[] = $row;
 
+
         return $ret;
     }
 
-    public function createAlbum($name, $desc, $order){
+    /**
+     * @param $name
+     * @param $desc
+     * @param int $order
+     * @return bool|int
+     *  false on failure
+     *  inserted id on success
+     */
+    public function createAlbum($name, $desc, $order = 0){
         global $CONF;
+        $this->ERROR = null;
         $ret = false;
 
         $query = $this->db->prepare("INSERT INTO ".$CONF["tables"]["pig_albums"]." (name, description, weight) VALUES (?, ?, ?)");
@@ -75,7 +86,7 @@ class PIG_Controller {
         $query->bind_param("ssi", $name, $desc, $order);
 
         if($query->execute())
-            $ret = true;
+            $ret = $query->insert_id;
         else{
             $this->setError("UNKNOWN", $query->error);
         }

@@ -10,11 +10,14 @@
 require_once("config.php");
 require_once("PIG_controller.php");
 
+//TODO should be accessed only through PIGController
 $db = new mysqli($CONF["DATABASE"]["host"], $CONF["DATABASE"]["user"], $CONF["DATABASE"]["password"], $CONF["DATABASE"]["database"]);
 if ($db->connect_error)
     error("Database connection failed");
 
 $PIG = new PIG_Controller();
+if(!is_null($PIG->ERROR))
+    error("Controller creation");
 
 if(array_key_exists("action", $_GET)){
     switch($_GET["action"]){
@@ -24,11 +27,14 @@ if(array_key_exists("action", $_GET)){
         case "getAlbums":
             getAlbums();
             break;
+        case "createAlbum":
+            createAlbum();
+            break;
         default:
             error("Invalid action");
     }
-}
-
+}else
+    error("No action");
 
 //TODO check permission
 //TODO error handling
@@ -111,6 +117,25 @@ function getAlbums(){
         error($PIG->ERROR);
 }
 
+function createAlbum(){
+    if(!array_key_exists("album", $_POST))
+        error("Album data is missing");
+
+    $data = $_POST["album"];
+    //TODO already parsed as an associative array, maybe need to verify?
+//    $data = json_decode($_POST["album"], true);
+//
+//    if(is_null($data))
+//        error("Failed to decode album data json");
+
+    global $PIG;
+    $ret = $PIG->createAlbum($data["name"], $data["description"]);
+
+    if($ret === false)
+        error("Album creation failed");
+    else
+        success(array("id" => $ret));
+}
 
 function success($response){
     header('Content-Type: application/json');

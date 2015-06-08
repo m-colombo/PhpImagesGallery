@@ -47,19 +47,13 @@ require_once("include/user_validation.php");
 
 <div id="main-content" class="container">
 
-<!--    -->
-<!--    <div class="row">-->
-<!--        <div class="col-xs-12 col-sm-6 col-md-3">-->
-<!---->
-<!--        </div>-->
-<!--    </div>-->
 
 </div>
 
 <div id="action-bottom-bar">
 
-    Drag images everywhere to upload
-    <div class="action-buttons pull-right btn-group">
+    <span data-pig-zone-message>Drag images everywhere to upload</span>
+    <div data-pig-zone-actions class="action-buttons pull-right btn-group">
             <button class="btn btn-default" data-toggle="modal" data-target="#modal_album_create"><span class="glyphicon glyphicon-plus"></span> Add Album</button>
 <!--            <a  class="btn btn-default" href="?p=settings"><span class="glyphicon glyphicon-cog"></span></a>-->
     </div>
@@ -90,7 +84,7 @@ require_once("include/user_validation.php");
 <div class="modal fade" id="modal_album_create">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form class="form-horizontal" method="post" action="?p=album&action=create">
+            <form class="form-horizontal">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Create album</h4>
@@ -99,19 +93,19 @@ require_once("include/user_validation.php");
                     <div class="form-group">
                         <label for="albumTitle" class="col-sm-2 control-label">Title</label>
                         <div class="col-sm-10">
-                            <input type="text" name="name" class="form-control" id="albumTitle" placeholder="Album name" maxlength="31">
+                            <input data-pig-create-name type="text" class="form-control" placeholder="Album name" maxlength="31">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="albumDesc" class="col-sm-2 control-label">Description</label>
                         <div class="col-sm-10">
-                            <textarea class="form-control" id="albumDesc" name="description" placeholder="Album description" ></textarea>
+                            <textarea data-pig-create-desc class="form-control" placeholder="Album description" ></textarea>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <input type="submit" class="btn btn-primary"/>
+                    <button type="button" class="btn btn-primary" onclick="PIG.Creator.Album($('#modal_album_create')[0])">Create</button>
                 </div>
             </form>
         </div><!-- /.modal-content -->

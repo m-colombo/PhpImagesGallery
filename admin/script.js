@@ -45,7 +45,10 @@ PIG.Conf = {
 PIG.Populator = {};
 PIG.Populator.Albums = function(container){
 
-    var layout = "<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3' data-pig-album-id="'-1'">" +
+    if(container === undefined)
+        container = $("#main-content")[0];
+
+    var layout = "<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3' data-pig-album-id='-1'>" +
         "<a href='' class='thumbnail' data-pig-album-link>" +
         "<img src='' data-pig-thumb />" +
         "<h4 data-pig-album-name ></h4>" +
@@ -56,11 +59,10 @@ PIG.Populator.Albums = function(container){
     $.ajax(PIG.Conf.ajax_target, {
         data: {action: "getAlbums"},
         success: function(data, status, jqXHR){
-            data = [1,2];
             for(var key in data){
                 var el = $(layout);
-
-                $(container).append(layout);
+                //TODO populate
+                $(container).append(el);
             }
         },
         error: function(jqXHR, status, error){
@@ -69,3 +71,38 @@ PIG.Populator.Albums = function(container){
         }
     });
 };
+
+PIG.Creator = {};
+PIG.Creator.Album = function(formRoot){
+
+    var name = $(formRoot).find("[data-pig-create-name]")[0].value;
+    var desc = $(formRoot).find("[data-pig-create-desc]")[0].value;
+
+    if(name === undefined || desc === undefined){
+        //TODO handle
+    }
+
+    $.ajax(PIG.Conf.ajax_target+"?action=createAlbum", {
+        method: "POST",
+        data: {
+            album: {
+                name: name,
+                description: desc
+            }
+        },
+
+        success: function(data, status, jqXHR){
+            console.log(data);
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+        }
+    })
+}
+
+
+/* INIT */
+$.ready(function(){
+
+})
