@@ -39,29 +39,98 @@ myDropzone.on("success", function(file, resp){
 var PIG = {};
 
 PIG.Conf = {
-    ajax_target: "../ajax_controller.php"
+    ajax_target: "../ajax_controller.php",
+    no_cover: "../no-cover.jpg",
+    default_zones: {
+        main: "[data-pig-main]",
+        header: "[data-pig-header]",
+        message: "[data-pig-bottom-message]"
+    }
 };
 
+PIG.Session = {
+    NoAlbumImages: 0,
+    CurrentAlbum: null,
+    AddingToAlbum: null
+};
+
+PIG.UIManager = {};
+PIG.UIManager.Albums = function (){
+    //Breadcrumb
+    var breadcrumbs = $(PIG.Conf.default_zones.header).find(".breadcrumb");
+    breadcrumbs.hide();
+    breadcrumbs.filter("[data-pig-breadcrumb-albums]").show();
+
+    //Action
+    var actions = $(PIG.Conf.default_zones.header).find(".btn-group");
+    actions.hide();
+    actions.filter("[data-pig-action-albums]").show();
+
+    //Content
+    PIG.Populator.Albums();
+
+    //Bottom bar
+    $(PIG.Conf.default_zones.message).text("Drag images everywhere to upload");
+}
+
+PIG.UIManager.Album = function(albumData){
+    //Breadcrumb
+    var breadcrumbs = $(PIG.Conf.default_zones.header).find(".breadcrumb");
+    breadcrumbs.hide();
+    var albumBC = breadcrumbs.filter("[data-pig-breadcrumb-album]");
+    $(albumBC).find("[data-pig-breadcrumb-album-name]").text(albumData["name"]);
+    albumBC.show();
+
+    //Action
+    var actions = $(PIG.Conf.default_zones.header).find(".btn-group");
+    actions.hide();
+    actions.filter("[data-pig-action-album]").show();
+
+
+    //Bottom bar
+    $(PIG.Conf.default_zones.message).text("Drag images everywhere to upload");
+}
+
+
 PIG.Populator = {};
+
+
 PIG.Populator.Albums = function(container){
 
     if(container === undefined)
-        container = $("#main-content")[0];
+        container = $(PIG.Conf.default_zones.main);
 
-    var layout = "<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3' data-pig-album-id='-1'>" +
-        "<a href='' class='thumbnail' data-pig-album-link>" +
-        "<img src='' data-pig-thumb />" +
-        "<h4 data-pig-album-name ></h4>" +
-        "<span data-pig-album-description ><span>" +
-        "</a></div>";
+    var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2' data-pig-album-id='-1' onClick=''>" +
+        "<button class='btn btn-default thumbnail' data-pig-album-link>" +
+        "<img src='"+(PIG.Conf.no_cover)+"' data-pig-thumb />" +
+        "<h4 data-pig-album-name style='display: inline-block' ></h4><br/>" +
+        "<span data-pig-album-description style='display: inline-block; '><span>" +
+        "</button></div>";
 
     //Get data
     $.ajax(PIG.Conf.ajax_target, {
         data: {action: "getAlbums"},
         success: function(data, status, jqXHR){
+            $(container).empty();
+
             for(var key in data){
                 var el = $(layout);
-                //TODO populate
+
+                (function() {
+                    var clos = data[key];
+                    el.on("click", function () {
+                        PIG.UIManager.Album(clos);
+                    })
+                })()
+
+                $(el).data("pig-album-id", data[key]["id"]);
+                $(el).find("[data-pig-album-name]").text(data[key]["name"]);
+                $(el).find("[data-pig-album-description]").text(data[key]["description"]);
+                if(data[key]["cover_filename"] != null )
+                    $(el).find("[data-pig-thumb]").attr("src", data[key]["cover_filename"] );
+
+                //TODO link
+
                 $(container).append(el);
             }
         },
@@ -78,9 +147,22 @@ PIG.Creator.Album = function(formRoot){
     var name = $(formRoot).find("[data-pig-create-name]")[0].value;
     var desc = $(formRoot).find("[data-pig-create-desc]")[0].value;
 
-    if(name === undefined || desc === undefined){
+    if(name === undefined){
         //TODO handle
     }
+
+    if(desc === undefined){
+        desc = "";
+    }
+
+    //Lock dialog waiting for server to response.
+    var closes = $(formRoot).find("[data-dismiss='modal']");
+    closes.attr("disabled", "disabled");
+    var submit = $(formRoot).find("[data-submit]");
+    submit.attr("disabled", "disabled");
+
+    var output = $(formRoot).find("[data-output]");
+    output.text("Creating album..");
 
     $.ajax(PIG.Conf.ajax_target+"?action=createAlbum", {
         method: "POST",
@@ -92,17 +174,34 @@ PIG.Creator.Album = function(formRoot){
         },
 
         success: function(data, status, jqXHR){
-            console.log(data);
+            closes.removeAttr("disabled");
+            submit.removeAttr("disabled");
+            output.text("Album successfully created");
+            PIG.Populator.Albums();
         },
 
         error: function(jqXHR, status, error){
             console.log(jqXHR);
+            //TODO comunicate the error; ie. duplicated album name
+            closes.removeAttr("disabled");
+            submit.removeAttr("disabled");
+            output.text("Something gone wrong");
         }
     })
 }
 
 
-/* INIT */
-$.ready(function(){
 
+
+//Clear modal content
+$('#modal_album_create').on('show.bs.modal', function (e) {
+    $('#modal_album_create').find("[data-output]").text("");
+    $('#modal_album_create').find("[data-pig-create-name]")[0].value = "";
+    $('#modal_album_create').find("[data-pig-create-desc]")[0].value = "";
 })
+
+
+
+//Page init //TODO in pageReady ?
+
+PIG.UIManager.Albums();

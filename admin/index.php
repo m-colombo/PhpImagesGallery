@@ -38,27 +38,43 @@ require_once("include/user_validation.php");
 </head>
 <body>
 
-<div id="header-bar">
-    <ol class="breadcrumb">
-        <li class=>PIG</li>
-        <li class="active">Albums</li>
+<!-- ================================= HEADER BAR =================================-->
+<div id="header-bar" data-pig-header>
+    <ol class="breadcrumb" data-pig-breadcrumb-albums style="display: inline-block">
+        <li>PIG</li>
+        <li class='active'>Albums</li>
     </ol>
-</div>
 
-<div id="main-content" class="container">
+    <ol class="breadcrumb" data-pig-breadcrumb-album style="display: inline-block">
+        <li>PIG</li>
+        <li><a href='javascript:void(0);' onclick='PIG.UIManager.Albums()'>Albums</a></li>
+        <li class='active' data-pig-breadcrumb-album-name></li>
+    </ol>
 
+    <div class="pull-right btn-group" data-pig-action-album style="display:none">
+        <button class="btn btn-default" ><span class="glyphicon glyphicon-plus"></span> Add images</button>
+        <button class="btn btn-default" ><span class="glyphicon glyphicon-pencil"></span> Edit info</button>
+        <button class="btn btn-default" ><span class="glyphicon glyphicon-trash"></span> Delete</button>
+    </div>
 
-</div>
-
-<div id="action-bottom-bar">
-
-    <span data-pig-zone-message>Drag images everywhere to upload</span>
-    <div data-pig-zone-actions class="action-buttons pull-right btn-group">
-            <button class="btn btn-default" data-toggle="modal" data-target="#modal_album_create"><span class="glyphicon glyphicon-plus"></span> Add Album</button>
-<!--            <a  class="btn btn-default" href="?p=settings"><span class="glyphicon glyphicon-cog"></span></a>-->
+    <div data-pig-action-albums class="action-buttons pull-right btn-group" style="display:none">
+        <button class="btn btn-default"  data-toggle="modal" data-target="#modal_album_create"><span class="glyphicon glyphicon-plus"></span> Add Album</button>
     </div>
 </div>
 
+<!-- ================================= MAIN CONTENT =================================-->
+<div data-pig-main class="container" id="main-content">
+
+
+</div>
+
+<!-- ================================= BOTTOM BAR =================================-->
+<div id="action-bottom-bar">
+    <span data-pig-bottom-message></span>
+</div>
+
+
+<!-- ================================= HIDDEN MODALS =================================-->
 
 <!-- IMAGES UPLOAD MODAL -->
 <div class="modal fade"  id="modal-images-update" >
@@ -81,7 +97,7 @@ require_once("include/user_validation.php");
 </div><!-- /.modal -->
 
 <!-- CREATE ALBUM DIALOG-->
-<div class="modal fade" id="modal_album_create">
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modal_album_create">
     <div class="modal-dialog">
         <div class="modal-content">
             <form class="form-horizontal">
@@ -104,8 +120,9 @@ require_once("include/user_validation.php");
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <span data-output style="margin-right: 1em"></span>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="PIG.Creator.Album($('#modal_album_create')[0])">Create</button>
+                    <button type="button" class="btn btn-primary" data-submit onclick="PIG.Creator.Album($('#modal_album_create')[0])">Create</button>
                 </div>
             </form>
         </div><!-- /.modal-content -->

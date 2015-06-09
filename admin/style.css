@@ -4,6 +4,8 @@
 /* Top bar */
 #header-bar {
     width: 100%;
+    position: fixed;
+    z-index: 10;
     top: 0;
     background: lightgrey;
     border-bottom: 1px dashed grey;
@@ -28,6 +30,10 @@
 
 #action-bottom-bar .action-buttons{
 
+}
+
+#main-content{
+    margin: 4em auto;
 }
 
 /* Dropzone styling */
