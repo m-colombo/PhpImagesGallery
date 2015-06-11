@@ -52,7 +52,7 @@ require_once("include/user_validation.php");
     </ol>
 
     <div class="pull-right btn-group" data-pig-action-album style="display:none">
-        <button class="btn btn-default" ><span class="glyphicon glyphicon-plus"></span> Add images</button>
+        <button class="btn btn-default" onclick="PIG.Action.Album.Add()"><span class="glyphicon glyphicon-plus"></span> Add images</button>
         <button class="btn btn-default" ><span class="glyphicon glyphicon-pencil"></span> Edit info</button>
         <button class="btn btn-default" ><span class="glyphicon glyphicon-trash"></span> Delete</button>
     </div>
@@ -70,6 +70,16 @@ require_once("include/user_validation.php");
 
 <!-- ================================= BOTTOM BAR =================================-->
 <div id="action-bottom-bar">
+    <div class="pull-left btn-group" data-pig-action-adding style="display:none">
+        <button class="btn btn-default btn-xs""><span class="glyphicon glyphicon-plus"></span> Add</button>
+        <button class="btn btn-default btn-xs" ><span class="glyphicon glyphicon-cancel"></span> Cancel</button>
+    </div>
+
+    <div class="pull-left btn-group" data-pig-action-selecting style="display:none">
+        <button class="btn btn-default btn-xs" ><span class="glyphicon glyphicon-pencil"></span> Cancel</button>
+        <button class="btn btn-default btn-xs" ><span class="glyphicon glyphicon-trash"></span> Delete</button>
+    </div>
+
     <span data-pig-bottom-message></span>
     <button style="display: none" data-pig-unassigned class="btn btn-default btn-xs pull-right" type="button" onclick="PIG.UIManager.UnassignedImages()">
         Unassigned <span class="badge"></span>

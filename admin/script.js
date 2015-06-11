@@ -55,6 +55,21 @@ PIG.Session = {
     ImagesSelection: []
 };
 
+
+PIG.Action = {};
+
+PIG.Action.Album = {};
+PIG.Action.Album.Add = function(){
+    PIG.Session.AddingToAlbum = PIG.Session.CurrentAlbum;
+    PIG.UIManager.ActionBar();
+}
+
+PIG.Action.Image = {};
+PIG.Action.Image.Select = function(image){
+    PIG.Session.ImagesSelection.push(image);    //TODO avoid duplicate
+    PIG.UIManager.ActionBar();
+}
+
 PIG.UIManager = {};
 
 PIG.UIManager.ActionBar = function(){
@@ -106,7 +121,8 @@ PIG.UIManager.Album = function(albumData){
     //Action
     var actions = $(PIG.Conf.default_zones.header).find(".btn-group");
     actions.hide();
-    actions.filter("[data-pig-action-album]").show();
+    var sactions = actions.filter("[data-pig-action-album]")
+    sactions.show();
 
     //Content
     PIG.Populator.Album(albumData["id"]);
@@ -204,12 +220,12 @@ PIG.Populator.UnassignedImages = function(container){
             for(var key in data){
                 var el = $(layout);
 
-                //(function() {
-                //    var clos = data[key];
-                //    el.on("click", function () {
-                //
-                //    })
-                //})()
+                (function() {
+                    var clos = data[key];
+                    el.on("click", function () {
+                        PIG.Action.Image.Select(clos);
+                    })
+                })()
 
                 $(el).data("pig-image-id", data[key]["id"]);
                 $(el).find("[data-pig-image-name]").text(data[key]["name"]);
@@ -225,7 +241,6 @@ PIG.Populator.UnassignedImages = function(container){
         }
     });
 }
-
 
 PIG.Populator.Album = function(albumId, container){
     if(container === undefined)
