@@ -30,6 +30,12 @@ if(array_key_exists("action", $_GET)){
         case "createAlbum":
             createAlbum();
             break;
+        case "getUnassignedImages":
+            getUnassignedImages();
+            break;
+        case "getAlbumImages":
+            getAlbumImages();
+            break;
         default:
             error("Invalid action");
     }
@@ -135,6 +141,29 @@ function createAlbum(){
         error("Album creation failed");
     else
         success(array("id" => $ret));
+}
+
+function getUnassignedImages(){
+    global $PIG;
+    $ret = $PIG->getUnassignedImages();
+
+    if($ret !== false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+function getAlbumImages(){
+    if(!array_key_exists("id", $_GET))
+        error("No album id");
+
+    global $PIG;
+    $ret = $PIG->getAlbumImages($_GET["id"]);
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
 }
 
 function success($response){

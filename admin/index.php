@@ -71,6 +71,9 @@ require_once("include/user_validation.php");
 <!-- ================================= BOTTOM BAR =================================-->
 <div id="action-bottom-bar">
     <span data-pig-bottom-message></span>
+    <button style="display: none" data-pig-unassigned class="btn btn-default btn-xs pull-right" type="button" onclick="PIG.UIManager.UnassignedImages()">
+        Unassigned <span class="badge"></span>
+    </button>
 </div>
 
 

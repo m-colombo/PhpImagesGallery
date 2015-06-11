@@ -15,7 +15,7 @@ class PIG_Controller {
 
     /** If an error occurs you'll find:
          array(
-              "type"      => "CONNECTION" | "UNKNOWN",
+              "type"      => "CONNECTION" | "QUERY" | "INSERT" | "UNKNOWN",
               "detail"    => string
          )
      */
@@ -55,7 +55,7 @@ class PIG_Controller {
 
 
         if(!$result){
-            $this->setError("UNKNOWN", $this->db->error);
+            $this->setError("QUERY", $this->db->error);
             return false;
         }
 
@@ -88,7 +88,59 @@ class PIG_Controller {
         if($query->execute())
             $ret = $query->insert_id;
         else{
-            $this->setError("UNKNOWN", $query->error);
+            $this->setError("INSERT", $query->error);
+        }
+
+        $query->close();
+        return $ret;
+    }
+
+
+    public function getUnassignedImages(){
+        global $CONF;
+        $this->ERROR = null;
+
+        $result = $this->db->query("SELECT I.* FROM ".$CONF["tables"]["pig_images"]." as I LEFT JOIN ".$CONF["tables"]["pig_album_images"]." as AI
+            ON I.id = AI.image
+            WHERE AI.album IS NULL
+        ");
+
+        if(!$result){
+            $this->setError("QUERY", $this->db->error);
+            return false;
+        }
+
+        $ret = array();
+        while($row = $result->fetch_assoc())
+            $ret[] = $row;
+
+        return $ret;
+    }
+
+    public function getAlbumImages($id){
+        global $CONF;
+        $this->ERROR = null;
+        $ret = false;
+
+
+        $query = $this->db->prepare("SELECT AI.*, filename, width, height FROM
+          ".$CONF["tables"]["pig_album_images"]." as AI JOIN
+          ".$CONF["tables"]["pig_images"]." as I ON
+            I.id = AI.image
+          WHERE AI.album = ?
+          ORDER BY AI.weight
+          ");
+
+        $query->bind_param("i", $id);
+
+        if($query->execute()) {
+            $result = $query->get_result();
+            $ret = array();
+            while($row = $result->fetch_assoc())
+                $ret[] = $row;
+
+        }else{
+            $this->setError("QUERY", $query->error);
         }
 
         $query->close();

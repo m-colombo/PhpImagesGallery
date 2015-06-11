@@ -49,13 +49,32 @@ PIG.Conf = {
 };
 
 PIG.Session = {
-    NoAlbumImages: 0,
+    NoAlbumImages: null,
     CurrentAlbum: null,
-    AddingToAlbum: null
+    AddingToAlbum: null,
+    ImagesSelection: []
 };
 
 PIG.UIManager = {};
+
+PIG.UIManager.ActionBar = function(){
+    var msg = $(PIG.Conf.default_zones.message);
+
+    if(PIG.Session.AddingToAlbum != null)
+        msg.text("Selected " + (PIG.Session.ImagesSelection.length) + " images to be added to " + PIG.Session.AddingToAlbum["name"]);
+    else if(PIG.Session.ImagesSelection.length > 0)
+        msg.text("Selected " + (PIG.Session.ImagesSelection.length) + " images");
+    else if(PIG.Session.CurrentAlbum != null)
+        msg.text("Drag images everywhere to upload into " + PIG.Session.CurrentAlbum["name"]);
+    else
+        msg.text("Drag images everywhere to upload");
+
+}
+
 PIG.UIManager.Albums = function (){
+    //Session update
+    PIG.Session.CurrentAlbum = null;
+
     //Breadcrumb
     var breadcrumbs = $(PIG.Conf.default_zones.header).find(".breadcrumb");
     breadcrumbs.hide();
@@ -70,10 +89,13 @@ PIG.UIManager.Albums = function (){
     PIG.Populator.Albums();
 
     //Bottom bar
-    $(PIG.Conf.default_zones.message).text("Drag images everywhere to upload");
+    PIG.UIManager.ActionBar();
 }
 
 PIG.UIManager.Album = function(albumData){
+    //Session update
+    PIG.Session.CurrentAlbum = albumData;
+
     //Breadcrumb
     var breadcrumbs = $(PIG.Conf.default_zones.header).find(".breadcrumb");
     breadcrumbs.hide();
@@ -86,14 +108,37 @@ PIG.UIManager.Album = function(albumData){
     actions.hide();
     actions.filter("[data-pig-action-album]").show();
 
+    //Content
+    PIG.Populator.Album(albumData["id"]);
 
     //Bottom bar
-    $(PIG.Conf.default_zones.message).text("Drag images everywhere to upload");
+    PIG.UIManager.ActionBar();
+}
+
+PIG.UIManager.UnassignedImages = function(){
+    //Session update
+    PIG.Session.CurrentAlbum = null;
+
+    //Breadcrumb
+    var breadcrumbs = $(PIG.Conf.default_zones.header).find(".breadcrumb");
+    breadcrumbs.hide();
+    var albumBC = breadcrumbs.filter("[data-pig-breadcrumb-album]");
+    $(albumBC).find("[data-pig-breadcrumb-album-name]").text("Unassigned images");
+    albumBC.show();
+
+    //Action
+    var actions = $(PIG.Conf.default_zones.header).find(".btn-group");
+    actions.hide();
+
+    //Content
+    PIG.Populator.UnassignedImages();
+
+    //Bottom bar
+    PIG.UIManager.ActionBar();
 }
 
 
 PIG.Populator = {};
-
 
 PIG.Populator.Albums = function(container){
 
@@ -140,6 +185,91 @@ PIG.Populator.Albums = function(container){
         }
     });
 };
+
+PIG.Populator.UnassignedImages = function(container){
+    if(container === undefined)
+        container = $(PIG.Conf.default_zones.main);
+
+    var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2' data-pig-image-id='-1' onClick=''>" +
+        "<button class='btn btn-default thumbnail' data-pig-album-link>" +
+        "<img src='' data-pig-thumb />" +
+        "<h4 data-pig-image-name style='display: inline-block' ></h4><br/>" +
+        "</button></div>";
+
+    $.ajax(PIG.Conf.ajax_target, {
+        data: {action: "getUnassignedImages"},
+        success: function(data, status, jqXHR){
+            $(container).empty();
+
+            for(var key in data){
+                var el = $(layout);
+
+                //(function() {
+                //    var clos = data[key];
+                //    el.on("click", function () {
+                //
+                //    })
+                //})()
+
+                $(el).data("pig-image-id", data[key]["id"]);
+                $(el).find("[data-pig-image-name]").text(data[key]["name"]);
+                $(el).find("[data-pig-thumb]").attr("src", "../thumbnails/" + data[key]["filename"] );
+
+
+                $(container).append(el);
+            }
+        },
+        error: function(jqXHR, status, error){
+            //TODO
+            alert(status);
+        }
+    });
+}
+
+
+PIG.Populator.Album = function(albumId, container){
+    if(container === undefined)
+        container = $(PIG.Conf.default_zones.main);
+
+    var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2' data-pig-album-image-id='-1' onClick=''>" +
+        "<button class='btn btn-default thumbnail' data-pig-album-link>" +
+        "<img src='' data-pig-thumb />" +
+        "<h4 data-pig-image-name style='display: inline-block' ></h4><br/>" +
+        "<span data-pig-image-description style='display: inline-block; '><span>" +
+        "</button></div>";
+
+    //Get data
+    $.ajax(PIG.Conf.ajax_target, {
+        data: {action: "getAlbumImages", id: albumId},
+        success: function(data, status, jqXHR){
+            $(container).empty();
+
+            for(var key in data){
+                var el = $(layout);
+
+                //(function() {
+                //    var clos = data[key];
+                //    el.on("click", function () {
+                //        PIG.UIManager.Album(clos);
+                //    })
+                //})()
+
+                $(el).data("pig-album-image-id", data[key]["id"]);
+                $(el).find("[data-pig-image-name]").text(data[key]["image_name"]);
+                $(el).find("[data-pig-image-description]").text(data[key]["image_description"]);
+                $(el).find("[data-pig-thumb]").attr("src", "../thumbnails/" + data[key]["filename"] );
+
+                //TODO link
+
+                $(container).append(el);
+            }
+        },
+        error: function(jqXHR, status, error){
+            //TODO
+            alert(status);
+        }
+    });
+}
 
 PIG.Creator = {};
 PIG.Creator.Album = function(formRoot){
@@ -204,4 +334,22 @@ $('#modal_album_create').on('show.bs.modal', function (e) {
 
 //Page init //TODO in pageReady ?
 
+//Start view
 PIG.UIManager.Albums();
+
+//Unassigned images
+$.ajax(PIG.Conf.ajax_target, {
+    data: {action: "getUnassignedImages"},
+    success: function(data, status, jqXHR){
+        if(data.length > 0) {
+            var bt = $('[data-pig-unassigned]');
+            bt.show();
+            bt.find('.badge').text(data.length);
+        }
+        PIG.Session.NoAlbumImages = data.length;
+    },
+    error: function(jqXHR, status, error){
+        //TODO
+        alert(status);
+    }
+});
