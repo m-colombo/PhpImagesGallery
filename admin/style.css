@@ -36,6 +36,23 @@
     margin: 4em auto;
 }
 
+
+/* =================== Component styling =================== */
+
+/* Image box */
+
+.PIGImage{
+
+    height: 10em;   /* Fastest work around for same height column */
+
+}
+
+.PIGImage button{
+    width: 100%;
+    height: 95%;
+}
+
+
 /* Dropzone styling */
 .dz-preview{
     border: 1px dashed grey;

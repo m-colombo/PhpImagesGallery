@@ -174,7 +174,7 @@ PIG.Populator.Albums = function(container){
         data: {action: "getAlbums"},
         success: function(data, status, jqXHR){
             $(container).empty();
-
+            var count = 0;
             for(var key in data){
                 var el = $(layout);
 
@@ -194,6 +194,14 @@ PIG.Populator.Albums = function(container){
                 //TODO link
 
                 $(container).append(el);
+
+                count++;
+                if(count % 3 == 0)
+                    $(container).append("<div class='clearfix visible-xs-block'></div>");
+                if(count % 4 == 0)
+                    $(container).append("<div class='clearfix visible-sm-block'></div>");
+                if(count % 6 == 0)
+                    $(container).append("<div class='clearfix visible-md-block visible-lg-block'></div>");
             }
         },
         error: function(jqXHR, status, error){
@@ -207,7 +215,7 @@ PIG.Populator.UnassignedImages = function(container){
     if(container === undefined)
         container = $(PIG.Conf.default_zones.main);
 
-    var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2' data-pig-image-id='-1' onClick=''>" +
+    var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2 PIGImage' data-pig-image-id='-1' onClick=''>" +
         "<button class='btn btn-default thumbnail' data-pig-album-link>" +
         "<img src='' data-pig-thumb />" +
         "<h4 data-pig-image-name style='display: inline-block' ></h4><br/>" +
@@ -217,6 +225,8 @@ PIG.Populator.UnassignedImages = function(container){
         data: {action: "getUnassignedImages"},
         success: function(data, status, jqXHR){
             $(container).empty();
+
+            var count = 0;
 
             for(var key in data){
                 var el = $(layout);
@@ -234,6 +244,14 @@ PIG.Populator.UnassignedImages = function(container){
 
 
                 $(container).append(el);
+
+                count++;
+                if(count % 3 == 0)
+                    $(container).append("<div class='clearfix visible-xs-block'></div>");
+                if(count % 4 == 0)
+                    $(container).append("<div class='clearfix visible-sm-block'></div>");
+                if(count % 6 == 0)
+                    $(container).append("<div class='clearfix visible-md-block visible-lg-block'></div>");
             }
         },
         error: function(jqXHR, status, error){
@@ -259,6 +277,7 @@ PIG.Populator.Album = function(albumId, container){
         data: {action: "getAlbumImages", id: albumId},
         success: function(data, status, jqXHR){
             $(container).empty();
+            var count = 0;
 
             for(var key in data){
                 var el = $(layout);
@@ -278,6 +297,14 @@ PIG.Populator.Album = function(albumId, container){
                 //TODO link
 
                 $(container).append(el);
+
+                count++;
+                if(count % 3 == 0)
+                    $(container).append("<div class='clearfix visible-xs-block'></div>");
+                if(count % 4 == 0)
+                    $(container).append("<div class='clearfix visible-sm-block'></div>");
+                if(count % 6 == 0)
+                    $(container).append("<div class='clearfix visible-md-block visible-lg-block'></div>");
             }
         },
         error: function(jqXHR, status, error){

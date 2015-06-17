@@ -63,9 +63,10 @@ require_once("include/user_validation.php");
 </div>
 
 <!-- ================================= MAIN CONTENT =================================-->
-<div data-pig-main class="container" id="main-content">
+<div class="container">
+<div data-pig-main class="row" id="main-content">
 
-
+</div>
 </div>
 
 <!-- ================================= BOTTOM BAR =================================-->
