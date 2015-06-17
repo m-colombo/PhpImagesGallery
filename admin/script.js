@@ -28,6 +28,7 @@ var myDropzone = new Dropzone("html",
     });
 
 $("#modal-images-update .btn-primary").on('click', function (e) {
+    myDropzone.options.url = (PIG.Session.CurrentAlbum == null ? "../ajax_controller.php?action=upload-images" : "../ajax_controller.php?action=upload-images"+"&album="+PIG.Session.CurrentAlbum.id);
     myDropzone.processQueue();
 })
 

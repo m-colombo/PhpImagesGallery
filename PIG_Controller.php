@@ -95,7 +95,6 @@ class PIG_Controller {
         return $ret;
     }
 
-
     public function getUnassignedImages(){
         global $CONF;
         $this->ERROR = null;
@@ -145,5 +144,32 @@ class PIG_Controller {
 
         $query->close();
         return $ret;
+    }
+
+    public function addImage($name, $filename, $width, $height, $album = null){
+        global $CONF;
+        $this->ERROR = null;
+
+        $query = $this->db->prepare("INSERT INTO ".($CONF["tables"]["pig_images"])." (name, filename, width, height) VALUES(?, ?, ?, ?)");
+        $query->bind_param("ssii", $name, $filename, $width, $height);
+
+        if(!$query->execute()) {
+            $this->setError("QUERY", $query->error);
+            return false;
+        }
+
+        if(!is_null($album)){
+            $imageId = $query->insert_id;
+            $query->close();
+            $query = $this->db->prepare("INSERT INTO ".($CONF["tables"]["pig_album_images"])." (album, image, image_name) VALUES(?,?,?)");
+            $query->bind_param("iis", $album, $imageId, $filename);
+            if(!$query->execute()) {
+                $this->setError("QUERY", $query->error);
+                return false;
+            }
+        }
+        $query->close();
+
+        return true;
     }
 }

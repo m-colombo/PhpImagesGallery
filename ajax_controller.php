@@ -44,7 +44,7 @@ if(array_key_exists("action", $_GET)){
 
 //TODO check permission
 //TODO error handling
-function processImageFromFile($tempFile, $album = null)
+function processImageFromFile($tempFile)
 {
     global $CONF;
     $dstMaxWidth = $CONF["IMAGES_CONF"]["max_store_width"];
@@ -92,24 +92,15 @@ function processImageFromFile($tempFile, $album = null)
     $image->writeImage("./thumbnails/$dstName");
     $image->destroy();
 
+    /* Database */
+    $album = null;
+    if(array_key_exists("album", $_GET))
+        $album = $_GET["album"];
 
-    /* Database */  //TODO move into PIG_Controller
-    global $db;
-    $query = $db->prepare("INSERT INTO ".($CONF["tables"]["pig_images"])." (name, filename, width, height) VALUES(?, ?, ?, ?)");
-    $query->bind_param("ssii", $_FILES["file"]["name"], $dstName, $dstWidth, $dstHeight);
+    global $PIG;
+    if(!$PIG->addImage($_FILES["file"]["name"], $dstName, $dstWidth, $dstHeight, $album))
+        error($PIG->ERROR);
 
-    if(!$query->execute())
-        error("Database insert failed");
-
-    if(!is_null($album)){
-        $imageId = $query->insert_id;
-        $query->close();
-        $query = $db->prepare("INSERT INTO ".($CONF["tables"]["pig_album_images"])." (album, image, image_name) VALUES(?,?,?)");
-        $query->bind_param("iis", $album, $imageId, $_FILES["file"]["name"]);
-        if(!$query->execute())
-            error("Image insertion into album failed");
-    }
-    $query->close();
 
 }
 
