@@ -52,6 +52,28 @@
     height: 95%;
 }
 
+.PIGImage .pig_thumb{
+    height: 70%;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+
+}
+
+.PIGImage h4{
+    width: 100%;
+    display: inline-block;
+    font-size: 1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.PIGImage span{
+    display: inline-block;
+    font-size: 0.7em;
+}
+
 
 /* Dropzone styling */
 .dz-preview{

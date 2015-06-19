@@ -217,8 +217,8 @@ PIG.Populator.UnassignedImages = function(container){
 
     var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2 PIGImage' data-pig-image-id='-1' onClick=''>" +
         "<button class='btn btn-default thumbnail' data-pig-album-link>" +
-        "<img src='' data-pig-thumb />" +
-        "<h4 data-pig-image-name style='display: inline-block' ></h4><br/>" +
+        "<div class='pig_thumb' data-pig-thumb ></div>" +
+        "<h4 data-pig-image-name ></h4><br/>" +
         "</button></div>";
 
     $.ajax(PIG.Conf.ajax_target, {
@@ -240,7 +240,7 @@ PIG.Populator.UnassignedImages = function(container){
 
                 $(el).data("pig-image-id", data[key]["id"]);
                 $(el).find("[data-pig-image-name]").text(data[key]["name"]);
-                $(el).find("[data-pig-thumb]").attr("src", "../thumbnails/" + data[key]["filename"] );
+                $(el).find("[data-pig-thumb]").css("background-image", "url('../thumbnails/" + data[key]["filename"] +"')" );
 
 
                 $(container).append(el);
@@ -265,11 +265,11 @@ PIG.Populator.Album = function(albumId, container){
     if(container === undefined)
         container = $(PIG.Conf.default_zones.main);
 
-    var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2' data-pig-album-image-id='-1' onClick=''>" +
+    var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2 PIGImage' data-pig-album-image-id='-1' onClick=''>" +
         "<button class='btn btn-default thumbnail' data-pig-album-link>" +
-        "<img src='' data-pig-thumb />" +
-        "<h4 data-pig-image-name style='display: inline-block' ></h4><br/>" +
-        "<span data-pig-image-description style='display: inline-block; '><span>" +
+        "<div class='pig_thumb' data-pig-thumb ></div>" +
+        "<h4 data-pig-image-name ></h4><br/>" +
+        "<span data-pig-image-description '><span>" +
         "</button></div>";
 
     //Get data
@@ -292,7 +292,7 @@ PIG.Populator.Album = function(albumId, container){
                 $(el).data("pig-album-image-id", data[key]["id"]);
                 $(el).find("[data-pig-image-name]").text(data[key]["image_name"]);
                 $(el).find("[data-pig-image-description]").text(data[key]["image_description"]);
-                $(el).find("[data-pig-thumb]").attr("src", "../thumbnails/" + data[key]["filename"] );
+                $(el).find("[data-pig-thumb]").css("background-image", "url('../thumbnails/" + data[key]["filename"] +"')" );
 
                 //TODO link
 
