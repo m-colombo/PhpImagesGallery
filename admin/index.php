@@ -154,11 +154,7 @@ require_once("include/user_validation.php");
             <div class="modal-body">
             </div>
             <div class="modal-footer">
-                <div class="pull-left">
-                    <button type="button" class="btn btn-danger">Delete</button>
-                    <button type="button" class="btn btn-warning">Remove from album</button>
-                </div>
-                <button type="button" class="btn btn-primary">Save</button>
+
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

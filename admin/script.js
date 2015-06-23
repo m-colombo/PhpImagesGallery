@@ -79,14 +79,32 @@ PIG.Action.Image.ShowDetail = function(image){
     var m = $('#modal-image-detail');
     m.find(".modal-body").empty();
     m.find(".modal-body").append("<img src='../images/"+(image["filename"])+"' /><br/>")
+
     if(image["album"] != undefined) {
         m.find(".modal-title").text(image["image_name"]);
         m.find(".modal-body").append("<input type='text' name='image_name' value='" + (image["image_name"]) + "' placeholder='Image name' /><br/>")
         m.find(".modal-body").append("<input type='text' name='image_description' placeholder='Image description' value='" + (image["image_description"] || "") + "' />")
+
+        m.find(".modal-footer").empty()
+        m.find(".modal-footer").append(
+            "<div class='pull-left'>" +
+                "<button type='button' class='btn btn-danger'>Delete</button>" +
+                "<button type='button' class='btn btn-warning'>Remove from album</button>" +
+            "</div>" +
+            "<button type='button' class='btn btn-success'>Save</button>" +
+            "<button type='button' class='btn btn-primary'>Set as cover</button>"
+        )
+
     }else{
         //UnAssigned Image
         m.find(".modal-title").text(image["name"]);
         m.find(".modal-body").append("<input type='text' name='image_name' value='" + (image["name"]) + "' placeholder='Image name' /><br/>")
+
+        m.find(".modal-footer").empty()
+        m.find(".modal-footer").append(
+            "<button type='button' class='btn btn-danger pull-left'>Delete</button>" +
+            "<button type='button' class='btn btn-primary'>Save</button>"
+        )
     }
     m.modal('show');
 }
@@ -385,7 +403,6 @@ PIG.Creator.Album = function(formRoot){
 
 
 
-
 //Clear modal content
 $('#modal_album_create').on('show.bs.modal', function (e) {
     $('#modal_album_create').find("[data-output]").text("");
@@ -400,7 +417,7 @@ $('#modal_album_create').on('show.bs.modal', function (e) {
 //Start view
 PIG.UIManager.Albums();
 
-//Unassigned images
+//Unassigned images TODO update
 $.ajax(PIG.Conf.ajax_target, {
     data: {action: "getUnassignedImages"},
     success: function(data, status, jqXHR){
