@@ -66,9 +66,29 @@ PIG.Action.Album.Add = function(){
 }
 
 PIG.Action.Image = {};
-PIG.Action.Image.Select = function(image){
-    PIG.Session.ImagesSelection.push(image);    //TODO avoid duplicate
+PIG.Action.Image.Click = function(image){
+    if(PIG.Session.ImagesSelection.length == 0)
+        PIG.Action.Image.ShowDetail(image);
+    else
+        PIG.Session.ImagesSelection.push(image);    //TODO avoid duplicate
+
     PIG.UIManager.ActionBar();
+}
+
+PIG.Action.Image.ShowDetail = function(image){
+    var m = $('#modal-image-detail');
+    m.find(".modal-body").empty();
+    m.find(".modal-body").append("<img src='../images/"+(image["filename"])+"' /><br/>")
+    if(image["album"] != undefined) {
+        m.find(".modal-title").text(image["image_name"]);
+        m.find(".modal-body").append("<input type='text' name='image_name' value='" + (image["image_name"]) + "' placeholder='Image name' /><br/>")
+        m.find(".modal-body").append("<input type='text' name='image_description' placeholder='Image description' value='" + (image["image_description"] || "") + "' />")
+    }else{
+        //UnAssigned Image
+        m.find(".modal-title").text(image["name"]);
+        m.find(".modal-body").append("<input type='text' name='image_name' value='" + (image["name"]) + "' placeholder='Image name' /><br/>")
+    }
+    m.modal('show');
 }
 
 PIG.UIManager = {};
@@ -234,7 +254,7 @@ PIG.Populator.UnassignedImages = function(container){
                 (function() {
                     var clos = data[key];
                     el.on("click", function () {
-                        PIG.Action.Image.Select(clos);
+                        PIG.Action.Image.Click(clos);
                     })
                 })()
 
@@ -282,12 +302,12 @@ PIG.Populator.Album = function(albumId, container){
             for(var key in data){
                 var el = $(layout);
 
-                //(function() {
-                //    var clos = data[key];
-                //    el.on("click", function () {
-                //        PIG.UIManager.Album(clos);
-                //    })
-                //})()
+                (function() {
+                    var clos = data[key];
+                    el.on("click", function () {
+                        PIG.Action.Image.Click(clos);
+                    })
+                })()
 
                 $(el).data("pig-album-image-id", data[key]["id"]);
                 $(el).find("[data-pig-image-name]").text(data[key]["image_name"]);
