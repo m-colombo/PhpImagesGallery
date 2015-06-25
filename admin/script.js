@@ -304,11 +304,16 @@ PIG.Populator.Album = function(albumId, container){
         container = $(PIG.Conf.default_zones.main);
 
     var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2 PIGImage' data-pig-album-image-id='-1' onClick=''>" +
-        "<button class='btn btn-default thumbnail' data-pig-album-link>" +
-        "<div class='pig_thumb' data-pig-thumb ></div>" +
-        "<h4 data-pig-image-name ></h4><br/>" +
-        "<span data-pig-image-description '><span>" +
-        "</button></div>";
+            "<button class='btn btn-default thumbnail' data-pig-album-link>" +
+                "<div class='pig_thumb' data-pig-thumb ></div>" +
+                "<h4 data-pig-image-name ></h4><br/>" +
+                "<span data-pig-image-description '></span>" +
+            "</button>" +
+            "<div class='overlay-actions'>" +
+            "<span class='glyphicon glyphicon-check'></span>" +
+            "<span class='glyphicon glyphicon-edit'></span>" +
+            "</div>" +
+        "</div>";
 
     //Get data
     $.ajax(PIG.Conf.ajax_target, {

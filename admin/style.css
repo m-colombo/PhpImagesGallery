@@ -35,12 +35,14 @@ html {
 /* =================== Component styling =================== */
 /* Image box */
 .PIGImage {
+  position: relative;
   height: 10em;
   /* Fastest work around for same height column */
 }
 .PIGImage button {
   width: 100%;
   height: 95%;
+  margin: 0;
 }
 .PIGImage .pig_thumb {
   height: 70%;
@@ -59,6 +61,23 @@ html {
 .PIGImage span {
   display: inline-block;
   font-size: 0.7em;
+}
+.PIGImage .overlay-actions {
+  width: 100%;
+  height: 95%;
+  opacity: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  position: relative;
+  top: -95%;
+}
+.PIGImage .overlay-actions span {
+  width: 50%;
+  height: 100%;
+  text-align: center;
+  font-size: 3em;
+}
+.PIGImage div.overlay-actions:hover {
+  opacity: 1;
 }
 /* =================== Modal styling =================== */
 #modal-image-detail {
