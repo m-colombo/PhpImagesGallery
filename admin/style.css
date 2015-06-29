@@ -36,48 +36,33 @@ html {
 /* Image box */
 .PIGImage {
   position: relative;
-  height: 10em;
+  height: 15em;
   /* Fastest work around for same height column */
-}
-.PIGImage button {
-  width: 100%;
-  height: 95%;
-  margin: 0;
-}
-.PIGImage .pig_thumb {
-  height: 70%;
-  width: 100%;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-.PIGImage h4 {
-  width: 100%;
-  display: inline-block;
-  font-size: 1em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .PIGImage span {
   display: inline-block;
   font-size: 0.7em;
 }
 .PIGImage .overlay-actions {
+  height: 70%;
   width: 100%;
-  height: 95%;
-  opacity: 0;
-  background-color: rgba(255, 255, 255, 0.7);
-  position: relative;
-  top: -95%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
-.PIGImage .overlay-actions span {
+.PIGImage .overlay-actions button {
+  opacity: 0;
+  background: rgba(255, 255, 255, 0.7);
+  border: 0;
   width: 50%;
   height: 100%;
   text-align: center;
   font-size: 3em;
 }
-.PIGImage div.overlay-actions:hover {
+.PIGImage .overlay-actions button:hover {
   opacity: 1;
+}
+div.PIGImage.selected {
+  background-color: red;
 }
 /* =================== Modal styling =================== */
 #modal-image-detail {
