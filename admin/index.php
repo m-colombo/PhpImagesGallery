@@ -72,23 +72,31 @@ require_once("include/user_validation.php");
 <!-- ================================= BOTTOM BAR =================================-->
 <div id="action-bottom-bar">
 
-
-
+<!--    Selection action-->
     <div class="pull-left btn-group dropup" data-pig-action-selecting style="display:none">
         <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Selection action <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
             <li><a href="javascript:PIG.Action.Selection.Cancel()"><span class="glyphicon glyphicon-remove"></span> Cancel selection</button></a></li>
-            <li data-pig-action-inalbum><a href=""><span class="glyphicon glyphicon-move"></span> Move selection to current album</button></a></li>
+            <li data-pig-action-inalbum><a href="javascript:PIG.Action.Selection.Move()"><span class="glyphicon glyphicon-move"></span> Move selection to current album</button></a></li>
             <li data-pig-action-inalbum><a href=""><span class="glyphicon glyphicon-duplicate"></span> Copy selection to current album</button></a></li>
             <li><a href="#"><span class="glyphicon glyphicon-minus"></span> Remove selection from albums</a></li>
             <li><a href="#"><span class="glyphicon glyphicon-trash"></span> Delete images and all reference in albums</a></li>
         </ul>
-
     </div>
 
-    <span data-pig-bottom-message></span>
+<!--    Waiting pending operation-->
+    <div class="pull-left btn-group" data-pig-action-pending style="display: none">
+        <button type="button" class="btn btn-default btn-xs">
+            <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> <span data-pig-pending-msg> aaaaa </span>
+        </button>
+    </div>
+
+<!--    Message    -->
+    <div style="display:inline-block" data-pig-bottom-message></div>
+
+<!--    Unassigned-->
     <button style="display: none" data-pig-unassigned class="btn btn-default btn-xs pull-right" type="button" onclick="PIG.UIManager.UnassignedImages()">
         Unassigned <span class="badge"></span>
     </button>
@@ -166,6 +174,25 @@ require_once("include/user_validation.php");
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- ERROR REPORT DIALOG -->
+<div class="modal fade"  id="modal-error" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
 
 <script src="<?php echo $CONF["LIBRARIES_ABS_PATH"]["jquery"]; ?>"></script>
 <script src="<?php echo $CONF["LIBRARIES_ABS_PATH"]["bootstrap"]."js/bootstrap.min.js" ;?>"></script>

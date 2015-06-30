@@ -36,6 +36,9 @@ if(array_key_exists("action", $_GET)){
         case "getAlbumImages":
             getAlbumImages();
             break;
+        case "moveImages":
+            moveImages();
+            break;
         default:
             error("Invalid action");
     }
@@ -150,6 +153,19 @@ function getAlbumImages(){
 
     global $PIG;
     $ret = $PIG->getAlbumImages($_GET["id"]);
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+function moveImages(){
+    if(!array_key_exists("destAlbum", $_GET))
+        error("No destination album id");
+
+    global $PIG;
+    $ret = $PIG->moveImages($_POST["selection"], $_GET["destAlbum"]);
 
     if($ret!==false)
         success($ret);

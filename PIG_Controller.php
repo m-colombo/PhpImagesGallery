@@ -15,7 +15,7 @@ class PIG_Controller {
 
     /** If an error occurs you'll find:
          array(
-              "type"      => "CONNECTION" | "QUERY" | "INSERT" | "UNKNOWN",
+              "type"      => "CONNECTION" | "QUERY" | "INSERT" | "DATA VALIDATION" |"UNKNOWN",
               "detail"    => string
          )
      */
@@ -169,6 +169,41 @@ class PIG_Controller {
             }
         }
         $query->close();
+
+        return true;
+    }
+
+    /**
+     * @param $imagesId array of ids.
+     * id > 0 refers to album_images.id
+     * id < 0 refers to images.id
+     * id = 0 refers to what.tf
+     * @return bool: success/failure
+     */
+    public function moveImages($imagesId, $destAlbum){
+        global $CONF;
+        $this->ERROR = null;
+
+        if(!is_numeric($destAlbum) || count(array_filter($imagesId, function($a){return is_numeric($a);})) != count($imagesId)){
+            $this->setError("DATA VALIDATION", "Not numeric ids");
+            return false;
+        }
+
+        $pos = array_filter($imagesId, function($a){return $a > 0;});
+        $neg = array_filter($imagesId, function($a){return $a < 0;});
+
+        if(count($pos) > 0)
+            if(!$this->db->query("UPDATE ".($CONF["tables"]["pig_album_images"])." SET album = $destAlbum WHERE id in (".(implode(',', $pos)).")")){
+                $this->setError("QUERY", array("query" => "UPDATE ".($CONF["tables"]["pig_album_images"])." SET album = $destAlbum WHERE id in (".(implode(',', $pos)).")", "error" => $this->db->error));
+                return false;
+            }
+        if(count($neg) > 0)
+            if(!$this->db->query("INSERT INTO ".($CONF["tables"]["pig_album_images"])."
+                (album, image, image_name)
+                    (SELECT $destAlbum as album, id as image, name FROM ".($CONF["tables"]["pig_images"])." WHERE id in (-".(implode(',-', $neg))."))")) {
+                $this->setError("QUERY", $this->db->error);
+                return false;
+            }
 
         return true;
     }

@@ -28,12 +28,14 @@ var myDropzone = new Dropzone("html",
     });
 
 $("#modal-images-update .btn-primary").on('click', function (e) {
+    myDropzone.UploadingToAlbum = PIG.Session.CurrentAlbum;
     myDropzone.options.url = (PIG.Session.CurrentAlbum == null ? "../ajax_controller.php?action=upload-images" : "../ajax_controller.php?action=upload-images"+"&album="+PIG.Session.CurrentAlbum.id);
     myDropzone.processQueue();
 })
 
 myDropzone.on("success", function(file, resp){
-    //$('body')[0].innerHTML = resp;
+    if(myDropzone.UploadingToAlbum == null)
+        PIG.Loader.UnassignedImages();
 });
 
 
@@ -53,14 +55,20 @@ PIG.Conf = {
 PIG.Session = {
     NoAlbumImages: null,
     CurrentAlbum: null,
-    ImagesSelection: []
+    ImagesSelection: [],
+    PendingSelectionAction: null
 };
 
 
 PIG.Action = {};
 
 PIG.Action.Image = {};
-PIG.Action.Image.Select = function(image){
+PIG.Action.Image.Select = function(image, DomEl){
+    if(PIG.Session.PendingSelectionAction)
+        return;
+
+    DomEl.toggleClass("selected");
+
     var id;
     if(image.album != undefined)    //TODO Album_Images doesn't have id
         id = image["id"];  //Album_Image ID
@@ -114,8 +122,36 @@ PIG.Action.Selection.Cancel = function(){
 };
 
 PIG.Action.Selection.Move = function(){
-    
+    PIG.Session.PendingSelectionAction = "Moving selection to " + PIG.Session.CurrentAlbum["name"];
+    PIG.UIManager.ActionBar();
+
+    var destAlbum = PIG.Session.CurrentAlbum["id"];
+    $.ajax(PIG.Conf.ajax_target+"?action=moveImages&destAlbum="+PIG.Session.CurrentAlbum["id"], {
+        method: "POST",
+        data: {
+            selection: PIG.Session.ImagesSelection
+        },
+
+        success: function(data, status, jqXHR){
+            PIG.Session.ImagesSelection = [];
+            PIG.Loader.UnassignedImages();
+            if(destAlbum == PIG.Session.CurrentAlbum["id"])
+                PIG.Populator.Album(destAlbum);
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+            PIG.UIManager.Error(PIG.Session.PendingSelectionAction + " FAILED", jqXHR);
+
+        },
+
+        complete: function(){
+            PIG.Session.PendingSelectionAction = null;
+            PIG.UIManager.ActionBar()
+        }
+    })
 }
+
 
 PIG.UIManager = {};
 
@@ -125,7 +161,11 @@ PIG.UIManager.ActionBar = function(){
     var selectActions = $(PIG.Conf.default_zones.bottom).find("[data-pig-action-selecting]");
     selectActions.hide();
 
-    if(PIG.Session.ImagesSelection.length > 0) {
+    if(PIG.Session.PendingSelectionAction){
+        msg.empty();
+        msg.append("<span class='glyphicon glyphicon-refresh glyphicon-refresh-animate'></span> <span data-pig-pending-msg>"+(PIG.Session.PendingSelectionAction)+"</span>");
+    }
+    else if(PIG.Session.ImagesSelection.length > 0) {
         msg.text("Selected " + (PIG.Session.ImagesSelection.length) + " images");
         selectActions.show();
         if(!PIG.Session.CurrentAlbum)
@@ -207,6 +247,14 @@ PIG.UIManager.UnassignedImages = function(){
     PIG.UIManager.ActionBar();
 }
 
+PIG.UIManager.Error = function(title, body){
+    var mod = $('#modal-error');
+    mod.find(".modal-title").text(title);
+    //mod.find(".modal-body").empty().append(body);
+    mod.find(".modal-body").text(body);
+    mod.modal("show");
+}
+
 
 PIG.Populator = {};
 
@@ -276,51 +324,42 @@ PIG.Populator.UnassignedImages = function(container){
         "<span data-pig-image-name ></span><br/>" +
         "</div>";
 
-    $.ajax(PIG.Conf.ajax_target, {
-        data: {action: "getUnassignedImages"},
-        success: function(data, status, jqXHR){
-            $(container).empty();
+    $(container).empty();
 
-            var count = 0;
+    var count = 0;
+    var data = PIG.Session.NoAlbumImages
+    for(var key in data){
+        var el = $(layout);
 
-            for(var key in data){
-                var el = $(layout);
+        (function() {
+            var clos = data[key];
+            var elClos = el;
+            $(el).find("[data-pig-action-edit]").on("click", function () {
+                PIG.Action.Image.ShowDetail(clos);
+            });
+            $(el).find("[data-pig-action-select]").on("click", function () {
+                PIG.Action.Image.Select(clos, elClos);
+            })
+        })()
 
-                (function() {
-                    var clos = data[key];
-                    var elClos = el;
-                    $(el).find("[data-pig-action-edit]").on("click", function () {
-                        PIG.Action.Image.ShowDetail(clos);
-                    });
-                    $(el).find("[data-pig-action-select]").on("click", function () {
-                        elClos.toggleClass("selected");
-                        PIG.Action.Image.Select(clos);
-                    })
-                })()
+        $(el).data("pig-image-id", data[key]["id"]);
+        $(el).find("[data-pig-image-name]").text(data[key]["name"]);
+        $(el).find("[data-pig-thumb]").css("background-image", "url('../thumbnails/" + data[key]["filename"] +"')" );
 
-                $(el).data("pig-image-id", data[key]["id"]);
-                $(el).find("[data-pig-image-name]").text(data[key]["name"]);
-                $(el).find("[data-pig-thumb]").css("background-image", "url('../thumbnails/" + data[key]["filename"] +"')" );
+        if(PIG.Session.ImagesSelection.indexOf(-data[key]["id"]) != -1)
+            el.toggleClass("selected");
 
-                if(PIG.Session.ImagesSelection.indexOf(-data[key]["id"]) != -1)
-                    el.toggleClass("selected");
+        $(container).append(el);
 
-                $(container).append(el);
+        count++;
+        if(count % 3 == 0)
+            $(container).append("<div class='clearfix visible-xs-block'></div>");
+        if(count % 4 == 0)
+            $(container).append("<div class='clearfix visible-sm-block'></div>");
+        if(count % 6 == 0)
+            $(container).append("<div class='clearfix visible-md-block visible-lg-block'></div>");
+    }
 
-                count++;
-                if(count % 3 == 0)
-                    $(container).append("<div class='clearfix visible-xs-block'></div>");
-                if(count % 4 == 0)
-                    $(container).append("<div class='clearfix visible-sm-block'></div>");
-                if(count % 6 == 0)
-                    $(container).append("<div class='clearfix visible-md-block visible-lg-block'></div>");
-            }
-        },
-        error: function(jqXHR, status, error){
-            //TODO
-            alert(status);
-        }
-    });
 }
 
 PIG.Populator.Album = function(albumId, container){
@@ -353,8 +392,7 @@ PIG.Populator.Album = function(albumId, container){
                         PIG.Action.Image.ShowDetail(clos);
                     });
                     $(el).find("[data-pig-action-select]").on("click", function () {
-                        elClos.toggleClass("selected");
-                        PIG.Action.Image.Select(clos);
+                        PIG.Action.Image.Select(clos, elClos);
                     })
                 })()
 
@@ -435,12 +473,35 @@ PIG.Creator.Album = function(formRoot){
 }
 
 
+PIG.Loader = {};
+PIG.Loader.UnassignedImages = function(){
+    $.ajax(PIG.Conf.ajax_target, {
+        data: {action: "getUnassignedImages"},
+        success: function(data, status, jqXHR){
+            if(data.length > 0) {
+                var bt = $('[data-pig-unassigned]');
+                bt.show();
+                bt.find('.badge').text(data.length);
+            }else{
+                var bt = $('[data-pig-unassigned]');
+                bt.hide();
+            }
+            PIG.Session.NoAlbumImages = data;
+        },
+        error: function(jqXHR, status, error){
+            console.log(jqXHR)
+            PIG.UIManager.Error("Failed loading unassigned images", jqXHR);
+        }
+    });
+}
+
 
 //Clear modal content
 $('#modal_album_create').on('show.bs.modal', function (e) {
-    $('#modal_album_create').find("[data-output]").text("");
-    $('#modal_album_create').find("[data-pig-create-name]")[0].value = "";
-    $('#modal_album_create').find("[data-pig-create-desc]")[0].value = "";
+    var mod = $('#modal_album_create');
+    mod.find("[data-output]").text("");
+    mod.find("[data-pig-create-name]")[0].value = "";
+    mod.find("[data-pig-create-desc]")[0].value = "";
 })
 
 
@@ -449,20 +510,4 @@ $('#modal_album_create').on('show.bs.modal', function (e) {
 
 //Start view
 PIG.UIManager.Albums();
-
-//Unassigned images TODO update
-$.ajax(PIG.Conf.ajax_target, {
-    data: {action: "getUnassignedImages"},
-    success: function(data, status, jqXHR){
-        if(data.length > 0) {
-            var bt = $('[data-pig-unassigned]');
-            bt.show();
-            bt.find('.badge').text(data.length);
-        }
-        PIG.Session.NoAlbumImages = data.length;
-    },
-    error: function(jqXHR, status, error){
-        //TODO
-        alert(status);
-    }
-});
+PIG.Loader.UnassignedImages(); //TODO update when needed
