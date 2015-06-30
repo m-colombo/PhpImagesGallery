@@ -52,9 +52,9 @@ require_once("include/user_validation.php");
     </ol>
 
     <div class="pull-right btn-group" data-pig-action-album style="display:none">
-        <button class="btn btn-default" onclick="PIG.Action.Album.Add()"><span class="glyphicon glyphicon-plus"></span> Add images</button>
-        <button class="btn btn-default" ><span class="glyphicon glyphicon-pencil"></span> Edit info</button>
-        <button class="btn btn-default" ><span class="glyphicon glyphicon-trash"></span> Delete</button>
+<!--        <button class="btn btn-default" onclick="PIG.Action.Album.Add()"><span class="glyphicon glyphicon-plus"></span> Add images</button>-->
+        <button class="btn btn-default" ><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+<!--        <button class="btn btn-default" ><span class="glyphicon glyphicon-trash"></span> Delete</button>-->
     </div>
 
     <div data-pig-action-albums class="action-buttons pull-right btn-group" style="display:none">
@@ -71,14 +71,21 @@ require_once("include/user_validation.php");
 
 <!-- ================================= BOTTOM BAR =================================-->
 <div id="action-bottom-bar">
-    <div class="pull-left btn-group" data-pig-action-adding style="display:none">
-        <button class="btn btn-default btn-xs""><span class="glyphicon glyphicon-plus"></span> Add</button>
-        <button class="btn btn-default btn-xs" ><span class="glyphicon glyphicon-cancel"></span> Cancel</button>
-    </div>
 
-    <div class="pull-left btn-group" data-pig-action-selecting style="display:none">
-        <button class="btn btn-default btn-xs" ><span class="glyphicon glyphicon-pencil"></span> Cancel</button>
-        <button class="btn btn-default btn-xs" ><span class="glyphicon glyphicon-trash"></span> Delete</button>
+
+
+    <div class="pull-left btn-group dropup" data-pig-action-selecting style="display:none">
+        <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Selection action <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="javascript:PIG.Action.Selection.Cancel()"><span class="glyphicon glyphicon-remove"></span> Cancel selection</button></a></li>
+            <li data-pig-action-inalbum><a href=""><span class="glyphicon glyphicon-move"></span> Move selection to current album</button></a></li>
+            <li data-pig-action-inalbum><a href=""><span class="glyphicon glyphicon-duplicate"></span> Copy selection to current album</button></a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-minus"></span> Remove selection from albums</a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-trash"></span> Delete images and all reference in albums</a></li>
+        </ul>
+
     </div>
 
     <span data-pig-bottom-message></span>
@@ -149,7 +156,7 @@ require_once("include/user_validation.php");
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Uploading images</h4>
+                <h4 class="modal-title"></h4>
             </div>
             <div class="modal-body">
             </div>

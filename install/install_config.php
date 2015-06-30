@@ -67,6 +67,7 @@ $INSTALL_CONFIG = array(
 
         "pig_album_images"  => "
             (
+                `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 `album` int(11) NOT NULL,
                 `image` int(11) NOT NULL,
                 `image_name` varchar(32) DEFAULT NULL,

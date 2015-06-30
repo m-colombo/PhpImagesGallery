@@ -45,25 +45,19 @@ PIG.Conf = {
     default_zones: {
         main: "[data-pig-main]",
         header: "[data-pig-header]",
-        message: "[data-pig-bottom-message]"
+        message: "[data-pig-bottom-message]",
+        bottom: "#action-bottom-bar"
     }
 };
 
 PIG.Session = {
     NoAlbumImages: null,
     CurrentAlbum: null,
-    AddingToAlbum: null,
     ImagesSelection: []
 };
 
 
 PIG.Action = {};
-
-PIG.Action.Album = {};
-PIG.Action.Album.Add = function(){
-    PIG.Session.AddingToAlbum = PIG.Session.CurrentAlbum;
-    PIG.UIManager.ActionBar();
-}
 
 PIG.Action.Image = {};
 PIG.Action.Image.Select = function(image){
@@ -94,10 +88,6 @@ PIG.Action.Image.ShowDetail = function(image){
 
         m.find(".modal-footer").empty()
         m.find(".modal-footer").append(
-            "<div class='pull-left'>" +
-                "<button type='button' class='btn btn-danger'>Delete</button>" +
-                "<button type='button' class='btn btn-warning'>Remove from album</button>" +
-            "</div>" +
             "<button type='button' class='btn btn-success'>Save</button>" +
             "<button type='button' class='btn btn-primary'>Set as cover</button>"
         )
@@ -116,15 +106,33 @@ PIG.Action.Image.ShowDetail = function(image){
     m.modal('show');
 }
 
+PIG.Action.Selection = {}
+PIG.Action.Selection.Cancel = function(){
+    PIG.Session.ImagesSelection = [];
+    PIG.UIManager.ActionBar();
+    $('.PIGImage').removeClass("selected");
+};
+
+PIG.Action.Selection.Move = function(){
+    
+}
+
 PIG.UIManager = {};
 
 PIG.UIManager.ActionBar = function(){
     var msg = $(PIG.Conf.default_zones.message);
 
-    if(PIG.Session.AddingToAlbum != null)
-        msg.text("Selected " + (PIG.Session.ImagesSelection.length) + " images to be added to " + PIG.Session.AddingToAlbum["name"]);
-    else if(PIG.Session.ImagesSelection.length > 0)
+    var selectActions = $(PIG.Conf.default_zones.bottom).find("[data-pig-action-selecting]");
+    selectActions.hide();
+
+    if(PIG.Session.ImagesSelection.length > 0) {
         msg.text("Selected " + (PIG.Session.ImagesSelection.length) + " images");
+        selectActions.show();
+        if(!PIG.Session.CurrentAlbum)
+            selectActions.find("[data-pig-action-inalbum]").hide();
+        else
+            selectActions.find("[data-pig-action-inalbum]").show();
+    }
     else if(PIG.Session.CurrentAlbum != null)
         msg.text("Drag images everywhere to upload into " + PIG.Session.CurrentAlbum["name"]);
     else
@@ -260,7 +268,7 @@ PIG.Populator.UnassignedImages = function(container){
     if(container === undefined)
         container = $(PIG.Conf.default_zones.main);
 
-    var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2 PIGImage' data-pig-album-image-id='-1'>" +
+    var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2 PIGImage' data-pig-image-id='-1'>" +
         "<div class='overlay-actions btn-group thumbnail' data-pig-thumb>" +
         "<button data-pig-action-select><span class='glyphicon glyphicon-check'></span></button>" +
         "<button data-pig-action-edit><span class='glyphicon glyphicon-edit'></span></button>" +
@@ -280,11 +288,12 @@ PIG.Populator.UnassignedImages = function(container){
 
                 (function() {
                     var clos = data[key];
-                    var clos = data[key];
+                    var elClos = el;
                     $(el).find("[data-pig-action-edit]").on("click", function () {
                         PIG.Action.Image.ShowDetail(clos);
                     });
                     $(el).find("[data-pig-action-select]").on("click", function () {
+                        elClos.toggleClass("selected");
                         PIG.Action.Image.Select(clos);
                     })
                 })()
@@ -293,6 +302,8 @@ PIG.Populator.UnassignedImages = function(container){
                 $(el).find("[data-pig-image-name]").text(data[key]["name"]);
                 $(el).find("[data-pig-thumb]").css("background-image", "url('../thumbnails/" + data[key]["filename"] +"')" );
 
+                if(PIG.Session.ImagesSelection.indexOf(-data[key]["id"]) != -1)
+                    el.toggleClass("selected");
 
                 $(container).append(el);
 
@@ -316,7 +327,7 @@ PIG.Populator.Album = function(albumId, container){
     if(container === undefined)
         container = $(PIG.Conf.default_zones.main);
 
-    var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2 PIGImage' data-pig-album-image-id='-1' onClick=''>" +
+    var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2 PIGImage' data-pig-album-image-id='-1'>" +
             "<div class='overlay-actions btn-group pig_thumb' data-pig-thumb>" +
                 "<button data-pig-action-select><span class='glyphicon glyphicon-check'></span></button>" +
                 "<button data-pig-action-edit><span class='glyphicon glyphicon-edit'></span></button>" +
@@ -335,8 +346,6 @@ PIG.Populator.Album = function(albumId, container){
             for(var key in data){
                 var el = $(layout);
 
-                if(PIG.Session.indexOf(data["id"]))
-
                 (function() {
                     var clos = data[key];
                     var elClos = el;
@@ -353,6 +362,10 @@ PIG.Populator.Album = function(albumId, container){
                 $(el).find("[data-pig-image-name]").text(data[key]["image_name"]);
                 $(el).find("[data-pig-image-description]").text(data[key]["image_description"] || "" );
                 $(el).find("[data-pig-thumb]").css("background-image", "url('../thumbnails/" + data[key]["filename"] +"')" );
+
+                if(PIG.Session.ImagesSelection.indexOf(data[key]["id"]) != -1)
+                    el.toggleClass("selected");
+
 
                 $(container).append(el);
 

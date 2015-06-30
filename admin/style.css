@@ -62,7 +62,7 @@ html {
   opacity: 1;
 }
 div.PIGImage.selected {
-  background-color: red;
+  background-color: #c8ffc8;
 }
 /* =================== Modal styling =================== */
 #modal-image-detail {
