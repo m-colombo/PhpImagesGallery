@@ -61,8 +61,9 @@ PIG.Session = {
 
 
 PIG.Action = {};
-
+PIG.Action.UnassignedImage = {}
 PIG.Action.Image = {};
+
 PIG.Action.Image.Select = function(image, DomEl){
     if(PIG.Session.PendingSelectionAction)
         return;
@@ -91,27 +92,123 @@ PIG.Action.Image.ShowDetail = function(image){
 
     if(image["album"] != undefined) {
         m.find(".modal-title").text(image["image_name"]);
-        m.find(".modal-body").append("<input type='text' name='image_name' value='" + (image["image_name"]) + "' placeholder='Image name' /><br/>")
-        m.find(".modal-body").append("<input type='text' name='image_description' placeholder='Image description' value='" + (image["image_description"] || "") + "' />")
+        m.find(".modal-body").append("<input type='text' data-pig-edit-name value='" + (image["image_name"]) + "' placeholder='Image name' /><br/>")
+        m.find(".modal-body").append("<input type='text' data-pig-edit-desc placeholder='Image description' value='" + (image["image_description"] || "") + "' />")
 
         m.find(".modal-footer").empty()
         m.find(".modal-footer").append(
-            "<button type='button' class='btn btn-success'>Save</button>" +
-            "<button type='button' class='btn btn-primary'>Set as cover</button>"
+            "<button type='button' class='btn btn-danger pull-left' data-pig-action-delete>Delete</button>" +
+            "<button type='button' class='btn btn-warning pull-left' data-pig-action-remove>Remove from album</button>" +
+            "<button type='button' class='btn btn-success' data-pig-action-save>Save</button>" +
+            "<button type='button' class='btn btn-primary' data-pig-action-setcover>Set as cover</button>"
         )
 
+        !(function(){
+            m.find("[data-pig-action-save]").on("click", function(){
+                image["name"] = m.find("[data-pig-edit-name]")[0].value
+                image["description"] = m.find("[data-pig-edit-desc]")[0].value
+                PIG.Action.Image.UpdateInfo(image, m)
+            })
+        })()
     }else{
         //UnAssigned Image
         m.find(".modal-title").text(image["name"]);
-        m.find(".modal-body").append("<input type='text' name='image_name' value='" + (image["name"]) + "' placeholder='Image name' /><br/>")
+        m.find(".modal-body").append("<input type='text' data-pig-edit-name value='" + (image["name"]) + "' placeholder='Image name' /><br/>")
 
         m.find(".modal-footer").empty()
         m.find(".modal-footer").append(
-            "<button type='button' class='btn btn-danger pull-left'>Delete</button>" +
-            "<button type='button' class='btn btn-primary'>Save</button>"
-        )
+            "<button type='button' class='btn btn-danger pull-left' data-pig-action-delete>Delete</button>" +
+            "<button type='button' class='btn btn-success' data-pig-action-save>Save</button>"
+        );
+
+        //Dunno if is needed the closure
+        !(function(){
+            m.find("[data-pig-action-save]").on("click", function(){
+                image["name"] = m.find("[data-pig-edit-name]")[0].value
+                PIG.Action.UnassignedImage.UpdateInfo(image, m)
+            })
+            m.find("[data-pig-action-delete]").on("click", function(){
+                PIG.Action.UnassignedImage.Delete(image["id"], m)
+            })
+        })()
     }
     m.modal('show');
+}
+
+PIG.Action.Image.UpdateInfo = function(image, modal){
+    console.log(image)
+    modal.find("[data-pig-action-save]").append(" <span class='glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>")
+    $.ajax(PIG.Conf.ajax_target+"?action=updateImageInfo&albumImageId="+image["id"], {
+        method: "POST",
+        data: {
+            info: {"image_name": image["name"], image_description: image["description"]}   //Only this field is supported so far
+        },
+
+        success: function(data, status, jqXHR){
+            modal.modal("hide")
+            //TODO avoid reloading all the images
+            PIG.Populator.Album(PIG.Session.CurrentAlbum);
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+            PIG.UIManager.Error("ERROR UPLOADING IMAGE INFO FAILED", jqXHR);
+        },
+
+        complete: function(){
+
+        }
+    })
+}
+
+PIG.Action.UnassignedImage.UpdateInfo = function(image, modal){
+    modal.find("[data-pig-action-save]").append(" <span class='glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>")
+    $.ajax(PIG.Conf.ajax_target+"?action=updateImageInfo&imageId="+image["id"], {
+        method: "POST",
+        data: {
+            info: {"name": image["name"]}   //Only this field is supported so far
+        },
+
+        success: function(data, status, jqXHR){
+            modal.modal("hide")
+            //TODO avoid reloading all the images
+            PIG.Loader.UnassignedImages();
+            PIG.Populator.UnassignedImages();
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+            PIG.UIManager.Error("ERROR UPLOADING IMAGE INFO FAILED", jqXHR);
+        },
+
+        complete: function(){
+
+        }
+    })
+}
+
+
+PIG.Action.UnassignedImage.Delete = function(id, modal){
+    modal.find("[data-pig-action-save]").append(" <span class='glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>")
+    $.ajax(PIG.Conf.ajax_target+"?action=deleteImage&imageId="+id, {
+        method: "GET",
+
+        success: function(data, status, jqXHR){
+            modal.modal("hide")
+            //TODO avoid reloading all the images, if no images left write something
+            PIG.Loader.UnassignedImages();
+            PIG.Populator.UnassignedImages();
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+            PIG.UIManager.Error("ERROR UPLOADING IMAGE INFO FAILED", jqXHR);
+        },
+
+        complete: function(){
+
+        }
+    })
 }
 
 PIG.Action.Selection = {}
@@ -318,8 +415,8 @@ PIG.Populator.UnassignedImages = function(container){
 
     var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2 PIGImage' data-pig-image-id='-1'>" +
         "<div class='overlay-actions btn-group thumbnail' data-pig-thumb>" +
-        "<button data-pig-action-select><span class='glyphicon glyphicon-check'></span></button>" +
-        "<button data-pig-action-edit><span class='glyphicon glyphicon-edit'></span></button>" +
+        "<button data-pig-action-select title='Add this image to selection'><span class='glyphicon glyphicon-check'></span></button>" +
+        "<button data-pig-action-edit title='Edit information'><span class='glyphicon glyphicon-edit'></span></button>" +
         "</div>" +
         "<span data-pig-image-name ></span><br/>" +
         "</div>";

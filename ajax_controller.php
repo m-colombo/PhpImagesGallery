@@ -39,6 +39,12 @@ if(array_key_exists("action", $_GET)){
         case "moveImages":
             moveImages();
             break;
+        case "updateImageInfo":
+            updateImageInfo();
+            break;
+        case "deleteImage":
+            deleteImage();
+            break;
         default:
             error("Invalid action");
     }
@@ -166,6 +172,35 @@ function moveImages(){
 
     global $PIG;
     $ret = $PIG->moveImages($_POST["selection"], $_GET["destAlbum"]);
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+function updateImageInfo(){
+    global $PIG;
+    $ret = false;
+    if(array_key_exists("imageId", $_GET))
+        $ret = $PIG->updateImageInfo($_GET["imageId"], $_POST["info"]);
+    else if(array_key_exists("albumImageId", $_GET))
+        $ret = $PIG->updateAlbumImageInfo($_GET["albumImageId"], $_POST["info"]);
+    else
+        error("No image id");
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+function deleteImage(){
+    if(!array_key_exists("imageId", $_GET))
+        error("No image id");
+
+    global $PIG;
+    $ret = $PIG->deleteImage($_GET["imageId"]);
 
     if($ret!==false)
         success($ret);

@@ -207,4 +207,88 @@ class PIG_Controller {
 
         return true;
     }
+
+    /**
+     * @param $imageId
+     * @param $info array(field => value), ut to now accepts only 'name'
+     * @return bool: success/failure
+     */
+    public function updateImageInfo($imageId, $info){
+        global $CONF;
+        $this->ERROR = null;
+
+        $ALLOWED_FIELD = array("name");
+
+        $setClause = "";
+        foreach ($info as $field => $value) {
+
+            if(!in_array($field, $ALLOWED_FIELD)){
+                $this->setError("DATA_VALIDATION", "Invalid field $field");
+                return false;
+            }
+
+            if($setClause == "")
+                $setClause = "SET $field = '$value'"; //TODO this will break up really soon
+            else
+                $setClause .= ", $field = '$value'"; //TODO this will break up really soon
+
+        }
+
+       $query = $this->db->prepare("UPDATE ".($CONF["tables"]["pig_images"])." $setClause WHERE id = $imageId");
+         //TODO use bind_param!!
+
+        if(!$query->execute()) {
+            $this->setError("QUERY", $query->error);
+            return false;
+        }
+
+        return true;
+    }
+
+    public function updateAlbumImageInfo($albumImageId, $info){
+        global $CONF;
+        $this->ERROR = null;
+
+        $ALLOWED_FIELD = array("image_name", "image_description");
+
+        $setClause = "";
+        foreach ($info as $field => $value) {
+
+            if(!in_array($field, $ALLOWED_FIELD)){
+                $this->setError("DATA_VALIDATION", "Invalid field $field");
+                return false;
+            }
+
+            if($setClause == "")
+                $setClause = "SET $field = '$value'"; //TODO this will break up really soon
+            else
+                $setClause .= ", $field = '$value'"; //TODO this will break up really soon
+
+        }
+
+        $query = $this->db->prepare("UPDATE ".($CONF["tables"]["pig_album_images"])." $setClause WHERE id = $albumImageId");
+        //TODO use bind_param!!
+
+        if(!$query->execute()) {
+            $this->setError("QUERY", $query->error);
+            return false;
+        }
+
+        return true;
+    }
+
+    public function deleteImage($imageId)
+    {
+        global $CONF;
+        $this->ERROR = null;
+
+        $query = $this->db->prepare("DELETE FROM " . ($CONF["tables"]["pig_images"]) . " WHERE id = ?");
+        $query->bind_param("i", $imageId);
+
+         if (!$query->execute()) {
+             $this->setError("QUERY", $this->db->error);
+            return false;
+         }
+        return true;
+    }
 }
