@@ -291,4 +291,34 @@ class PIG_Controller {
          }
         return true;
     }
+
+    public function setAlbumCover($imageId, $albumId){
+        global $CONF;
+        $this->ERROR = null;
+
+        $query = $this->db->prepare("UPDATE " . ($CONF["tables"]["pig_albums"]) . " SET cover = ? WHERE id = ?");
+        $query->bind_param("ii", $imageId, $albumId);
+
+        if (!$query->execute()) {
+            $this->setError("QUERY", $this->db->error);
+            return false;
+        }
+        return true;
+
+    }
+
+    public function removeFromAlbum($imageId){
+        global $CONF;
+        $this->ERROR = null;
+
+        $query = $this->db->prepare("DELETE FROM " . ($CONF["tables"]["pig_album_images"]) . " WHERE id = ?");
+        $query->bind_param("i", $imageId);
+
+        if (!$query->execute()) {
+            $this->setError("QUERY", $this->db->error);
+            return false;
+        }
+        return true;
+
+    }
 }

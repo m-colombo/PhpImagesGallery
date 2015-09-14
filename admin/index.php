@@ -52,9 +52,7 @@ require_once("include/user_validation.php");
     </ol>
 
     <div class="pull-right btn-group" data-pig-action-album style="display:none">
-<!--        <button class="btn btn-default" onclick="PIG.Action.Album.Add()"><span class="glyphicon glyphicon-plus"></span> Add images</button>-->
-        <button class="btn btn-default" ><span class="glyphicon glyphicon-pencil"></span> Edit</button>
-<!--        <button class="btn btn-default" ><span class="glyphicon glyphicon-trash"></span> Delete</button>-->
+        <button class="btn btn-default" onclick="PIG.UIManager.AlbumDetail()"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
     </div>
 
     <div data-pig-action-albums class="action-buttons pull-right btn-group" style="display:none">
@@ -152,6 +150,37 @@ require_once("include/user_validation.php");
                     <span data-output style="margin-right: 1em"></span>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" data-submit onclick="PIG.Creator.Album($('#modal_album_create')[0])">Create</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- EDIT ALBUM DIALOG-->
+<div class="modal fade"  id="modal-album-detail">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body">
+                    <img data-pig-thumb src="../no-cover.jpg"  /> <br/>
+                    <div class="form-group">
+                        <label for="albumTitle" class="col-sm-2 control-label">Title</label>
+                        <div class="col-sm-10">
+                            <input data-pig-edit-name type="text" class="form-control" placeholder="Album name" maxlength="31">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="albumDesc" class="col-sm-2 control-label">Description</label>
+                        <div class="col-sm-10">
+                            <textarea data-pig-edit-desc class="form-control" placeholder="Album description" ></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
                 </div>
             </form>
         </div><!-- /.modal-content -->

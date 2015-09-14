@@ -45,6 +45,12 @@ if(array_key_exists("action", $_GET)){
         case "deleteImage":
             deleteImage();
             break;
+        case "setCover":
+            setCover();
+            break;
+        case "removeImageFromAlbum":
+            removeImage();
+            break;
         default:
             error("Invalid action");
     }
@@ -201,6 +207,35 @@ function deleteImage(){
 
     global $PIG;
     $ret = $PIG->deleteImage($_GET["imageId"]);
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+
+function setCover(){
+    if(!array_key_exists("imageId", $_GET))
+        error("No image id");
+    if(!array_key_exists("albumId", $_GET))
+        error("No album id");
+
+    global $PIG;
+    $ret = $PIG->setAlbumCover($_GET["imageId"], $_GET["albumId"]);
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+function removeImage(){
+    if(!array_key_exists("imageId", $_GET))
+        error("No image id");
+
+    global $PIG;
+    $ret = $PIG->removeFromAlbum($_GET["imageId"]);
 
     if($ret!==false)
         success($ret);

@@ -62,6 +62,7 @@ PIG.Session = {
 
 PIG.Action = {};
 PIG.Action.UnassignedImage = {}
+PIG.Action.AlbumImage = {}
 PIG.Action.Image = {};
 
 PIG.Action.Image.Select = function(image, DomEl){
@@ -97,7 +98,6 @@ PIG.Action.Image.ShowDetail = function(image){
 
         m.find(".modal-footer").empty()
         m.find(".modal-footer").append(
-            "<button type='button' class='btn btn-danger pull-left' data-pig-action-delete>Delete</button>" +
             "<button type='button' class='btn btn-warning pull-left' data-pig-action-remove>Remove from album</button>" +
             "<button type='button' class='btn btn-success' data-pig-action-save>Save</button>" +
             "<button type='button' class='btn btn-primary' data-pig-action-setcover>Set as cover</button>"
@@ -107,7 +107,13 @@ PIG.Action.Image.ShowDetail = function(image){
             m.find("[data-pig-action-save]").on("click", function(){
                 image["name"] = m.find("[data-pig-edit-name]")[0].value
                 image["description"] = m.find("[data-pig-edit-desc]")[0].value
-                PIG.Action.Image.UpdateInfo(image, m)
+                PIG.Action.AlbumImage.UpdateInfo(image, m)
+            })
+            m.find("[data-pig-action-setcover]").on("click", function(){
+                PIG.Action.Album.SetCover(image["image"], PIG.Session.CurrentAlbum["id"], m)
+            })
+            m.find("[data-pig-action-remove]").on("click", function(){
+                PIG.Action.AlbumImage.Remove(image["id"], m)
             })
         })()
     }else{
@@ -210,6 +216,49 @@ PIG.Action.UnassignedImage.Delete = function(id, modal){
         }
     })
 }
+
+PIG.Action.AlbumImage.Remove = function(id, modal){
+    modal.find("[data-pig-action-remove]").append(" <span class='glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>")
+    $.ajax(PIG.Conf.ajax_target+"?action=removeImageFromAlbum&imageId="+id, {
+        method: "GET",
+        success: function(data, status, jqXHR){
+            modal.modal("hide")
+            //TODO avoid reloading all the images, if no images left write something
+            PIG.Populator.Album(PIG.Session.CurrentAlbum);
+            PIG.Loader.UnassignedImages()
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+            PIG.UIManager.Error("ERROR UPLOADING IMAGE INFO FAILED", jqXHR);
+        },
+
+        complete: function(){
+
+        }
+    })
+}
+
+PIG.Action.Album = {}
+PIG.Action.Album.SetCover = function(coverId, albumId, modal){
+    modal.find("[data-pig-action-setcover]").append(" <span class='glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>")
+    $.ajax(PIG.Conf.ajax_target+"?action=setCover&imageId="+coverId+"&albumId="+albumId, {
+        method: "GET",
+        success: function(data, status, jqXHR){
+            modal.modal("hide")
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+            PIG.UIManager.Error("ERROR UPLOADING IMAGE INFO FAILED", jqXHR);
+        },
+
+        complete: function(){
+
+        }
+    })
+}
+
 
 PIG.Action.Selection = {}
 PIG.Action.Selection.Cancel = function(){
@@ -322,6 +371,38 @@ PIG.UIManager.Album = function(albumData){
     PIG.UIManager.ActionBar();
 }
 
+PIG.UIManager.AlbumDetail = function(){
+    var a = PIG.Session.CurrentAlbum;
+    console.log(a);
+    var m = $('#modal-album-detail');
+    m.modal("show")
+
+    m.find(".modal-title").text(a["name"]);
+    m.find("[data-pig-edit-name]")[0].value = a["name"]
+    m.find("[data-pig-edit-desc]")[0].value = a["description"]
+    m.find("[data-pig-thumb]")[0].src = '../thumbnails/'+(a["cover_filename"])
+
+    m.find(".modal-footer").empty()
+    m.find(".modal-footer").append(
+        "<button type='button' class='btn btn-danger pull-left' data-pig-action-delete>Delete</button>" +
+        "<button type='button' class='btn btn-success' data-pig-action-save>Save</button>"
+    )
+
+    //!(function(){
+    //    m.find("[data-pig-action-save]").on("click", function(){
+    //        image["name"] = m.find("[data-pig-edit-name]")[0].value
+    //        image["description"] = m.find("[data-pig-edit-desc]")[0].value
+    //        PIG.Action.AlbumImage.UpdateInfo(image, m)
+    //    })
+    //    m.find("[data-pig-action-setcover]").on("click", function(){
+    //        PIG.Action.Album.SetCover(image["image"], PIG.Session.CurrentAlbum["id"], m)
+    //    })
+    //    m.find("[data-pig-action-remove]").on("click", function(){
+    //        PIG.Action.AlbumImage.Remove(image["id"], m)
+    //    })
+    //})()
+}
+
 PIG.UIManager.UnassignedImages = function(){
     //Session update
     PIG.Session.CurrentAlbum = null;
@@ -387,7 +468,7 @@ PIG.Populator.Albums = function(container){
                 $(el).find("[data-pig-album-name]").text(data[key]["name"]);
                 $(el).find("[data-pig-album-description]").text(data[key]["description"]);
                 if(data[key]["cover_filename"] != null )
-                    $(el).find("[data-pig-thumb]").attr("src", data[key]["cover_filename"] );
+                    $(el).find("[data-pig-thumb]").attr("src", "../thumbnails/" + data[key]["cover_filename"] );
 
                 //TODO link
 
