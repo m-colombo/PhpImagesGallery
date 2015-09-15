@@ -141,7 +141,7 @@ PIG.Action.Image.ShowDetail = function(image){
     m.modal('show');
 }
 
-PIG.Action.Image.UpdateInfo = function(image, modal){
+PIG.Action.AlbumImage.UpdateInfo = function(image, modal){
     console.log(image)
     modal.find("[data-pig-action-save]").append(" <span class='glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>")
     $.ajax(PIG.Conf.ajax_target+"?action=updateImageInfo&albumImageId="+image["id"], {
@@ -258,7 +258,26 @@ PIG.Action.Album.SetCover = function(coverId, albumId, modal){
         }
     })
 }
+PIG.Action.Album.UpdateInfo = function(album, modal){
+    modal.find("[data-pig-action-save]").append(" <span class='glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>")
+    $.ajax(PIG.Conf.ajax_target+"?action=updateAlbumInfo&albumId="+album["id"], {
+        method: "POST",
+        data: {
+            info: {"name": album["name"], "description": album["description"]}   //Only this fields are supported so far TODO send only edits
+        },
 
+        success: function(data, status, jqXHR){
+            modal.modal("hide")
+            //TODO avoid reloading all
+            PIG.UIManager.Album(album)
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+            PIG.UIManager.Error("ERROR UPDATING ALBUM INFO FAILED", jqXHR);
+        }
+    })
+}
 
 PIG.Action.Selection = {}
 PIG.Action.Selection.Cancel = function(){
@@ -373,7 +392,6 @@ PIG.UIManager.Album = function(albumData){
 
 PIG.UIManager.AlbumDetail = function(){
     var a = PIG.Session.CurrentAlbum;
-    console.log(a);
     var m = $('#modal-album-detail');
     m.modal("show")
 
@@ -388,19 +406,16 @@ PIG.UIManager.AlbumDetail = function(){
         "<button type='button' class='btn btn-success' data-pig-action-save>Save</button>"
     )
 
-    //!(function(){
-    //    m.find("[data-pig-action-save]").on("click", function(){
-    //        image["name"] = m.find("[data-pig-edit-name]")[0].value
-    //        image["description"] = m.find("[data-pig-edit-desc]")[0].value
-    //        PIG.Action.AlbumImage.UpdateInfo(image, m)
-    //    })
-    //    m.find("[data-pig-action-setcover]").on("click", function(){
-    //        PIG.Action.Album.SetCover(image["image"], PIG.Session.CurrentAlbum["id"], m)
-    //    })
-    //    m.find("[data-pig-action-remove]").on("click", function(){
-    //        PIG.Action.AlbumImage.Remove(image["id"], m)
-    //    })
-    //})()
+    !(function(){
+        m.find("[data-pig-action-save]").on("click", function(){
+            a["name"] = m.find("[data-pig-edit-name]")[0].value
+            a["description"] = m.find("[data-pig-edit-desc]")[0].value
+            PIG.Action.Album.UpdateInfo(a, m)
+        })
+        //m.find("[data-pig-action-delete]").on("click", function(){
+        //    PIG.Action.Album.Delete(a["id"], m)
+        //})
+    })()
 }
 
 PIG.UIManager.UnassignedImages = function(){

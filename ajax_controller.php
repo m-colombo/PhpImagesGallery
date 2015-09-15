@@ -20,7 +20,7 @@ if(!is_null($PIG->ERROR))
     error("Controller creation");
 
 if(array_key_exists("action", $_GET)){
-    switch($_GET["action"]){
+    switch($_GET["action"]){    //TODO refactor, keep validated but more easy!
         case "upload-images":
             processImageFromFile($_FILES["file"]);
             break;
@@ -50,6 +50,9 @@ if(array_key_exists("action", $_GET)){
             break;
         case "removeImageFromAlbum":
             removeImage();
+            break;
+        case "updateAlbumInfo":
+            updateAlbum();
             break;
         default:
             error("Invalid action");
@@ -236,6 +239,20 @@ function removeImage(){
 
     global $PIG;
     $ret = $PIG->removeFromAlbum($_GET["imageId"]);
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+function updateAlbum(){
+    global $PIG;
+    $ret = false;
+    if(array_key_exists("albumId", $_GET))
+        $ret = $PIG->updateAlbumInfo($_GET["albumId"], $_POST["info"]);
+    else
+        error("No album id");
 
     if($ret!==false)
         success($ret);

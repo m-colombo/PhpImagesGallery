@@ -220,6 +220,8 @@ class PIG_Controller {
         $ALLOWED_FIELD = array("name");
 
         $setClause = "";
+        $paramsValue = [];
+        $paramsType = "";
         foreach ($info as $field => $value) {
 
             if(!in_array($field, $ALLOWED_FIELD)){
@@ -228,20 +230,26 @@ class PIG_Controller {
             }
 
             if($setClause == "")
-                $setClause = "SET $field = '$value'"; //TODO this will break up really soon
+                $setClause = "SET $field = ?";
             else
-                $setClause .= ", $field = '$value'"; //TODO this will break up really soon
+                $setClause .= ", $field = ?";
 
+            $paramsValue[] = &$info[$field];
+            $paramsType .= "s";
         }
 
-       $query = $this->db->prepare("UPDATE ".($CONF["tables"]["pig_images"])." $setClause WHERE id = $imageId");
-         //TODO use bind_param!!
+
+        $query = $this->db->prepare("UPDATE ".($CONF["tables"]["pig_images"])." $setClause WHERE id = ?");
+
+        $paramsValue[] = &$imageId;
+        $paramsType .= "i";
+
+        call_user_func_array(array($query, 'bind_param'), array_merge(array($paramsType), $paramsValue)); //Needed for dynamic binding TODO refactor
 
         if(!$query->execute()) {
             $this->setError("QUERY", $query->error);
             return false;
         }
-
         return true;
     }
 
@@ -252,6 +260,8 @@ class PIG_Controller {
         $ALLOWED_FIELD = array("image_name", "image_description");
 
         $setClause = "";
+        $paramsValue = [];
+        $paramsType = "";
         foreach ($info as $field => $value) {
 
             if(!in_array($field, $ALLOWED_FIELD)){
@@ -260,14 +270,21 @@ class PIG_Controller {
             }
 
             if($setClause == "")
-                $setClause = "SET $field = '$value'"; //TODO this will break up really soon
+                $setClause = "SET $field = ?";
             else
-                $setClause .= ", $field = '$value'"; //TODO this will break up really soon
+                $setClause .= ", $field = ?";
+
+            $paramsValue[] = &$info[$field];
+            $paramsType .= "s";
 
         }
 
-        $query = $this->db->prepare("UPDATE ".($CONF["tables"]["pig_album_images"])." $setClause WHERE id = $albumImageId");
-        //TODO use bind_param!!
+        $query = $this->db->prepare("UPDATE ".($CONF["tables"]["pig_album_images"])." $setClause WHERE id = ?");
+        $paramsValue[] = &$albumImageId;
+        $paramsType .= "i";
+
+        call_user_func_array(array($query, 'bind_param'), array_merge(array($paramsType), $paramsValue)); //Needed for dynamic binding TODO refactor
+
 
         if(!$query->execute()) {
             $this->setError("QUERY", $query->error);
@@ -320,5 +337,44 @@ class PIG_Controller {
         }
         return true;
 
+    }
+
+    public function updateAlbumInfo($albumId, $info){
+        global $CONF;
+        $this->ERROR = null;
+
+        $ALLOWED_FIELD = array("name", "description");
+
+        $setClause = "";
+        $paramsValue = [];
+        $paramsType = "";
+        foreach ($info as $field => $value) {
+
+            if(!in_array($field, $ALLOWED_FIELD)){
+                $this->setError("DATA_VALIDATION", "Invalid field $field");
+                return false;
+            }
+
+            if($setClause == "")
+                $setClause = "SET $field = ?";
+            else
+                $setClause .= ", $field = ?";
+
+            $paramsValue[] = &$info[$field];
+            $paramsType .= "s";
+        }
+
+        $query = $this->db->prepare("UPDATE ".($CONF["tables"]["pig_albums"])." $setClause WHERE id = ?");
+
+        $paramsValue[] = &$albumId;
+        $paramsType .= "i";
+
+        call_user_func_array(array($query, 'bind_param'), array_merge(array($paramsType), $paramsValue)); //Needed for dynamic binding TODO refactor
+
+        if(!$query->execute()) {
+            $this->setError("QUERY", $query->error);
+            return false;
+        }
+        return true;
     }
 }
