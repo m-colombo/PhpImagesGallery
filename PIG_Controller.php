@@ -299,6 +299,15 @@ class PIG_Controller {
         global $CONF;
         $this->ERROR = null;
 
+        //Get image info
+        $info_query = $this->db->prepare("SELECT filename FROM " . ($CONF["tables"]["pig_images"]) . " WHERE id = ?");
+        $info_query->bind_param("i", $imageId);
+        $filename = "";
+        $info_query->execute();
+        $info_query->bind_result($filename);
+        $info_query->fetch();
+        $info_query->close();
+
         $query = $this->db->prepare("DELETE FROM " . ($CONF["tables"]["pig_images"]) . " WHERE id = ?");
         $query->bind_param("i", $imageId);
 
@@ -306,6 +315,11 @@ class PIG_Controller {
              $this->setError("QUERY", $this->db->error);
             return false;
          }
+
+        //Delete file
+        unlink("./images/$filename");
+        unlink("./thumbnails/$filename");
+        
         return true;
     }
 
