@@ -193,7 +193,6 @@ PIG.Action.UnassignedImage.UpdateInfo = function(image, modal){
     })
 }
 
-
 PIG.Action.UnassignedImage.Delete = function(id, modal){
     modal.find("[data-pig-action-save]").append(" <span class='glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>")
     $.ajax(PIG.Conf.ajax_target+"?action=deleteImage&imageId="+id, {
@@ -278,6 +277,25 @@ PIG.Action.Album.UpdateInfo = function(album, modal){
         }
     })
 }
+PIG.Action.Album.Delete = function(albumId, modal){
+    modal.find("[data-pig-action-delete]").append(" <span class='glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>")
+    $.ajax(PIG.Conf.ajax_target+"?action=deleteAlbum&albumId="+albumId, {
+        method: "GET",
+        success: function(data, status, jqXHR){
+            modal.modal("hide")
+            PIG.Populator.Albums();
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+            PIG.UIManager.Error("ERROR UPLOADING IMAGE INFO FAILED", jqXHR);
+        },
+
+        complete: function(){
+
+        }
+    })
+}
 
 PIG.Action.Selection = {}
 PIG.Action.Selection.Cancel = function(){
@@ -285,7 +303,6 @@ PIG.Action.Selection.Cancel = function(){
     PIG.UIManager.ActionBar();
     $('.PIGImage').removeClass("selected");
 };
-
 PIG.Action.Selection.Move = function(){
     PIG.Session.PendingSelectionAction = "Moving selection to " + PIG.Session.CurrentAlbum["name"];
     PIG.UIManager.ActionBar();
@@ -316,10 +333,96 @@ PIG.Action.Selection.Move = function(){
         }
     })
 }
+PIG.Action.Selection.Remove = function(){
+    PIG.Session.PendingSelectionAction = "Removing selection from albums";
+    PIG.UIManager.ActionBar();
 
+    $.ajax(PIG.Conf.ajax_target+"?action=removeImages", {
+        method: "POST",
+        data: {
+            selection: PIG.Session.ImagesSelection
+        },
+
+        success: function(data, status, jqXHR){
+            PIG.Session.ImagesSelection = [];
+            PIG.Loader.UnassignedImages();
+            if(PIG.Session.CurrentAlbum)
+                PIG.Populator.Album(PIG.Session.CurrentAlbum["id"]);
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+            PIG.UIManager.Error(PIG.Session.PendingSelectionAction + " FAILED", jqXHR);
+
+        },
+
+        complete: function(){
+            PIG.Session.PendingSelectionAction = null;
+            PIG.UIManager.ActionBar()
+        }
+    })
+}
+PIG.Action.Selection.DeleteAll = function(){
+    PIG.Session.PendingSelectionAction = "Deleting selection images and removing from albums";
+    PIG.UIManager.ActionBar();
+
+    $.ajax(PIG.Conf.ajax_target+"?action=deleteAllImages", {
+        method: "POST",
+        data: {
+            selection: PIG.Session.ImagesSelection
+        },
+
+        success: function(data, status, jqXHR){
+            PIG.Session.ImagesSelection = [];
+            PIG.Loader.UnassignedImages();
+            if(PIG.Session.CurrentAlbum)
+                PIG.Populator.Album(PIG.Session.CurrentAlbum["id"]);
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+            PIG.UIManager.Error(PIG.Session.PendingSelectionAction + " FAILED", jqXHR);
+
+        },
+
+        complete: function(){
+            PIG.Session.PendingSelectionAction = null;
+            PIG.UIManager.ActionBar()
+        }
+    })
+}
+PIG.Action.Selection.Copy = function(){
+    PIG.Session.PendingSelectionAction = "Copying selection to " + PIG.Session.CurrentAlbum["name"];
+    PIG.UIManager.ActionBar();
+
+    var destAlbum = PIG.Session.CurrentAlbum["id"];
+    $.ajax(PIG.Conf.ajax_target+"?action=copyImages&destAlbum="+PIG.Session.CurrentAlbum["id"], {
+        method: "POST",
+        data: {
+            selection: PIG.Session.ImagesSelection
+        },
+
+        success: function(data, status, jqXHR){
+            PIG.Session.ImagesSelection = [];
+            PIG.Loader.UnassignedImages();
+            if(destAlbum == PIG.Session.CurrentAlbum["id"])
+                PIG.Populator.Album(destAlbum);
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+            PIG.UIManager.Error(PIG.Session.PendingSelectionAction + " FAILED", jqXHR);
+
+        },
+
+        complete: function(){
+            PIG.Session.PendingSelectionAction = null;
+            PIG.UIManager.ActionBar()
+        }
+    })
+}
 
 PIG.UIManager = {};
-
 PIG.UIManager.ActionBar = function(){
     var msg = $(PIG.Conf.default_zones.message);
 
@@ -344,7 +447,6 @@ PIG.UIManager.ActionBar = function(){
         msg.text("Drag images everywhere to upload");
 
 }
-
 PIG.UIManager.Albums = function (){
     //Session update
     PIG.Session.CurrentAlbum = null;
@@ -365,7 +467,6 @@ PIG.UIManager.Albums = function (){
     //Bottom bar
     PIG.UIManager.ActionBar();
 }
-
 PIG.UIManager.Album = function(albumData){
     //Session update
     PIG.Session.CurrentAlbum = albumData;
@@ -389,7 +490,6 @@ PIG.UIManager.Album = function(albumData){
     //Bottom bar
     PIG.UIManager.ActionBar();
 }
-
 PIG.UIManager.AlbumDetail = function(){
     var a = PIG.Session.CurrentAlbum;
     var m = $('#modal-album-detail');
@@ -412,12 +512,11 @@ PIG.UIManager.AlbumDetail = function(){
             a["description"] = m.find("[data-pig-edit-desc]")[0].value
             PIG.Action.Album.UpdateInfo(a, m)
         })
-        //m.find("[data-pig-action-delete]").on("click", function(){
-        //    PIG.Action.Album.Delete(a["id"], m)
-        //})
+        m.find("[data-pig-action-delete]").on("click", function(){
+            PIG.Action.Album.Delete(a["id"], m)
+        })
     })()
 }
-
 PIG.UIManager.UnassignedImages = function(){
     //Session update
     PIG.Session.CurrentAlbum = null;
@@ -439,7 +538,6 @@ PIG.UIManager.UnassignedImages = function(){
     //Bottom bar
     PIG.UIManager.ActionBar();
 }
-
 PIG.UIManager.Error = function(title, body){
     var mod = $('#modal-error');
     mod.find(".modal-title").text(title);

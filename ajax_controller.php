@@ -54,6 +54,18 @@ if(array_key_exists("action", $_GET)){
         case "updateAlbumInfo":
             updateAlbum();
             break;
+        case "removeImages":
+            removeImages();
+            break;
+        case "copyImages":
+            copyImages();
+            break;
+        case "deleteAllImages":
+            deleteAllImages();
+            break;
+        case "deleteAlbum":
+            deleteAlbum();
+            break;
         default:
             error("Invalid action");
     }
@@ -175,19 +187,6 @@ function getAlbumImages(){
         error($PIG->ERROR);
 }
 
-function moveImages(){
-    if(!array_key_exists("destAlbum", $_GET))
-        error("No destination album id");
-
-    global $PIG;
-    $ret = $PIG->moveImages($_POST["selection"], $_GET["destAlbum"]);
-
-    if($ret!==false)
-        success($ret);
-    else
-        error($PIG->ERROR);
-}
-
 function updateImageInfo(){
     global $PIG;
     $ret = false;
@@ -217,6 +216,62 @@ function deleteImage(){
         error($PIG->ERROR);
 }
 
+
+function moveImages(){
+    if(!array_key_exists("destAlbum", $_GET))
+        error("No destination album id");
+
+    global $PIG;
+    $ret = $PIG->moveImages($_POST["selection"], $_GET["destAlbum"]);
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+function removeImages(){
+    global $PIG;
+    $ret = $PIG->removeImages($_POST["selection"]);
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+function copyImages(){
+    global $PIG;
+
+    $ret = $PIG->copyImages($_POST["selection"], $_GET["destAlbum"]);
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+function deleteAllImages(){
+    global $PIG;
+
+    $ret = $PIG->deleteAllCopyAndReferences($_POST["selection"]);
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+function deleteAlbum(){
+    global $PIG;
+
+    $ret = $PIG->deleteAlbum($_GET["albumId"]);
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
 
 function setCover(){
     if(!array_key_exists("imageId", $_GET))

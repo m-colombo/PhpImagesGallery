@@ -73,14 +73,14 @@ require_once("include/user_validation.php");
 <!--    Selection action-->
     <div class="pull-left btn-group dropup" data-pig-action-selecting style="display:none">
         <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Selection action <span class="caret"></span>
+            Select action <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
             <li><a href="javascript:PIG.Action.Selection.Cancel()"><span class="glyphicon glyphicon-remove"></span> Cancel selection</button></a></li>
             <li data-pig-action-inalbum><a href="javascript:PIG.Action.Selection.Move()"><span class="glyphicon glyphicon-move"></span> Move selection to current album</button></a></li>
-            <li data-pig-action-inalbum><a href=""><span class="glyphicon glyphicon-duplicate"></span> Copy selection to current album</button></a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-minus"></span> Remove selection from albums</a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-trash"></span> Delete images and all reference in albums</a></li>
+            <li data-pig-action-inalbum><a href="javascript:PIG.Action.Selection.Copy()"><span class="glyphicon glyphicon-duplicate"></span> Copy selection to current album</button></a></li>
+            <li><a href="javascript:PIG.Action.Selection.Remove()"><span class="glyphicon glyphicon-minus"></span> Remove selection from albums</a></li>
+            <li><a href="javascript:PIG.Action.Selection.DeleteAll()"><span class="glyphicon glyphicon-trash"></span> Delete images and all reference in albums</a></li>
         </ul>
     </div>
 

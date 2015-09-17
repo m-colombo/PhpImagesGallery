@@ -209,6 +209,100 @@ class PIG_Controller {
     }
 
     /**
+     * @param $imagesId array of ids.
+     * id > 0 refers to album_images.id
+     * id < 0 refers to images.id
+     * id = 0 refers to what.tf
+     * @return bool: success/failure
+     */
+    public function copyImages($imagesId, $destAlbum){
+
+        global $CONF;
+        $this->ERROR = null;
+
+        if(!is_numeric($destAlbum) || count(array_filter($imagesId, function($a){return is_numeric($a);})) != count($imagesId)){
+            $this->setError("DATA VALIDATION", "Not numeric ids");
+            return false;
+        }
+
+        $pos = array_filter($imagesId, function($a){return $a > 0;});
+        $neg = array_filter($imagesId, function($a){return $a < 0;});
+
+        if(count($pos) > 0){
+            $query = "INSERT INTO ".($CONF["tables"]["pig_album_images"])." (album, image, image_name, image_description)
+            (SELECT $destAlbum as album, image, image_name, image_description FROM ".($CONF["tables"]["pig_album_images"])." WHERE id in (".(implode(',', $pos))."))";
+
+            if(!$this->db->query($query))
+             {
+                $this->setError("QUERY", array("query" => $query, "error" => $this->db->error));
+                return false;
+            }
+        }
+        if(count($neg) > 0)
+            if(!$this->db->query("INSERT INTO ".($CONF["tables"]["pig_album_images"])."
+                (album, image, image_name)
+                    (SELECT $destAlbum as album, id as image, name FROM ".($CONF["tables"]["pig_images"])." WHERE id in (-".(implode(',-', $neg))."))")) {
+                $this->setError("QUERY", $this->db->error);
+                return false;
+            }
+
+        return true;
+    }
+
+    /**
+     * @param $imagesId array of ids.
+     * id > 0 refers to album_images.id
+     * id < 0 refers to images.id
+     * id = 0 refers to what.tf
+     * @return bool: success/failure
+     */
+    public function deleteAllCopyAndReferences($imagesId){
+
+        global $CONF;
+        $this->ERROR = null;
+
+        if(count(array_filter($imagesId, function($a){return is_numeric($a);})) != count($imagesId)){
+            $this->setError("DATA VALIDATION", "Not numeric ids");
+            return false;
+        }
+
+        $pos = array_filter($imagesId, function($a){return $a > 0;});
+        $neg = array_filter($imagesId, function($a){return $a < 0;});
+
+        if(count($pos) > 0){
+            //Get actual image id
+            $query = "SELECT -image FROM ".($CONF["tables"]["pig_album_images"])." WHERE id in (".(implode(',', $pos)).")";
+            $res = $this->db->query($query)->fetch_all();
+            foreach($res as $r) {
+                $neg[] = $r[0];
+            }
+        }
+
+        if(count($neg) > 0) {
+            $res = $this->db->query("SELECT filename FROM ".($CONF["tables"]["pig_images"])." WHERE id in (-".(implode(',-', $neg)).")")->fetch_all();
+
+            $filenames = [];
+            foreach($res as $r)
+                $filenames[] = $r[0];
+
+            $query2 = $this->db->query("DELETE FROM ".($CONF["tables"]["pig_images"])." WHERE id in (-".(implode(',', $neg)).")");
+            $query3 = $this->db->query("DELETE FROM ".($CONF["tables"]["pig_album_images"])." WHERE image in (-".(implode(',', $neg)).")");
+
+            if($query2 !== false && $query3 !== false){
+                foreach($filenames as $f){
+                    unlink("./images/$f");
+                    unlink("./thumbnails/$f");
+                }
+            }else{
+                $this->setError("QUERY", $this->db->error);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @param $imageId
      * @param $info array(field => value), ut to now accepts only 'name'
      * @return bool: success/failure
@@ -319,7 +413,25 @@ class PIG_Controller {
         //Delete file
         unlink("./images/$filename");
         unlink("./thumbnails/$filename");
-        
+
+        return true;
+    }
+
+    public function deleteAlbum($albumId){
+        global $CONF;
+        $this->ERROR = null;
+
+        $query1 = $this->db->prepare("DELETE FROM " . ($CONF["tables"]["pig_album_images"]) . " WHERE album = ?");
+        $query1->bind_param("i", $albumId);
+
+        $query2 = $this->db->prepare("DELETE FROM ". ($CONF["tables"]["pig_albums"]) ." WHERE id = ?");
+        $query2->bind_param("i", $albumId);
+
+        if (!$query1->execute() || !$query2->execute()) {
+            $this->setError("QUERY", $this->db->error);
+            return false;
+        }
+
         return true;
     }
 
@@ -389,6 +501,34 @@ class PIG_Controller {
             $this->setError("QUERY", $query->error);
             return false;
         }
+        return true;
+    }
+
+    /**
+     * @param $imagesId array of ids.
+     * id > 0 refers to album_images.id
+     * id < 0 refers to images.id
+     * id = 0 refers to what.tf
+     * @return bool: success/failure
+     */
+    public function removeImages($imagesId){
+        global $CONF;
+        $this->ERROR = null;
+
+        if(count(array_filter($imagesId, function($a){return is_numeric($a);})) != count($imagesId)){
+            $this->setError("DATA VALIDATION", "Not numeric ids");
+            return false;
+        }
+
+        $pos = array_filter($imagesId, function($a){return $a > 0;});
+
+        if(count($pos) > 0)
+            if(!$this->db->query("DELETE FROM ".($CONF["tables"]["pig_album_images"])." WHERE id in (".(implode(',', $pos)).")")){
+                $this->setError("QUERY", array("query" => "DELETE ".($CONF["tables"]["pig_album_images"])." WHERE id in (".(implode(',', $pos)).")", "error" => $this->db->error));
+                return false;
+            }
+
+
         return true;
     }
 }
