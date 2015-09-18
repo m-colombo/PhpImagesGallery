@@ -1,4 +1,4 @@
-# PhpImagesGallery
+# PhpImagesGallery alpha-0.1
 A simple gallery manager, no presentation just PHP+Mysql backend. 
 
 ## Features: 
