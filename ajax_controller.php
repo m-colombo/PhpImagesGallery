@@ -7,6 +7,8 @@
  * License: MIT
  */
 
+session_start();
+
 require_once("config.php");
 require_once("PIG_controller.php");
 
@@ -20,59 +22,74 @@ if(!is_null($PIG->ERROR))
     error("Controller creation");
 
 if(array_key_exists("action", $_GET)){
-    switch($_GET["action"]){    //TODO refactor, keep validated but more easy!
-        case "upload-images":
-            processImageFromFile($_FILES["file"]);
-            break;
+
+    // administration action
+    $HasAdminActionMatched = false;
+    if(array_key_exists("PIG_USER", $_SESSION) && $_SESSION["PIG_USER"] == "admin"){
+        $HasAdminActionMatched = true;
+        switch($_GET["action"]){    //TODO refactor, keep validated but more easy!
+            case "upload-images":
+                processImageFromFile($_FILES["file"]);
+                break;
+            case "createAlbum":
+                createAlbum();
+                break;
+            case "getUnassignedImages":
+                getUnassignedImages();
+                break;
+            case "moveImages":
+                moveImages();
+                break;
+            case "updateImageInfo":
+                updateImageInfo();
+                break;
+            case "deleteImage":
+                deleteImage();
+                break;
+            case "setCover":
+                setCover();
+                break;
+            case "removeImageFromAlbum":
+                removeImage();
+                break;
+            case "updateAlbumInfo":
+                updateAlbum();
+                break;
+            case "removeImages":
+                removeImages();
+                break;
+            case "copyImages":
+                copyImages();
+                break;
+            case "deleteAllImages":
+                deleteAllImages();
+                break;
+            case "deleteAlbum":
+                deleteAlbum();
+                break;
+            default:
+                $HasAdminActionMatched = false;
+
+        }
+    }
+
+    // Anonymous allowed action
+    switch($_GET["action"]){
         case "getAlbums":
             getAlbums();
-            break;
-        case "createAlbum":
-            createAlbum();
-            break;
-        case "getUnassignedImages":
-            getUnassignedImages();
             break;
         case "getAlbumImages":
             getAlbumImages();
             break;
-        case "moveImages":
-            moveImages();
-            break;
-        case "updateImageInfo":
-            updateImageInfo();
-            break;
-        case "deleteImage":
-            deleteImage();
-            break;
-        case "setCover":
-            setCover();
-            break;
-        case "removeImageFromAlbum":
-            removeImage();
-            break;
-        case "updateAlbumInfo":
-            updateAlbum();
-            break;
-        case "removeImages":
-            removeImages();
-            break;
-        case "copyImages":
-            copyImages();
-            break;
-        case "deleteAllImages":
-            deleteAllImages();
-            break;
-        case "deleteAlbum":
-            deleteAlbum();
-            break;
         default:
-            error("Invalid action");
+            if(!$HasAdminActionMatched)
+                error("No valid action");
     }
+
+
 }else
     error("No action");
 
-//TODO check permission
 //TODO error handling
 function processImageFromFile($tempFile)
 {
