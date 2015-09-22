@@ -29,13 +29,15 @@ var myDropzone = new Dropzone("html",
 
 $("#modal-images-update .btn-primary").on('click', function (e) {
     myDropzone.UploadingToAlbum = PIG.Session.CurrentAlbum;
-    myDropzone.options.url = (PIG.Session.CurrentAlbum == null ? "../ajax_controller.php?action=upload-images" : "../ajax_controller.php?action=upload-images"+"&album="+PIG.Session.CurrentAlbum.id);
+    myDropzone.options.url = (PIG.Session.CurrentAlbum <= 0 ? "../ajax_controller.php?action=upload-images" : "../ajax_controller.php?action=upload-images"+"&album="+PIG.Session.CurrentAlbum.id);
     myDropzone.processQueue();
 })
 
 myDropzone.on("success", function(file, resp){
-    if(myDropzone.UploadingToAlbum == null)
+    if(PIG.Session.CurrentAlbum <= 0)
         PIG.Loader.UnassignedImages();
+    else
+        PIG.Populator.Album(PIG.Session.CurrentAlbum["id"]);
 });
 
 
@@ -346,7 +348,7 @@ PIG.Action.Selection.Remove = function(){
         success: function(data, status, jqXHR){
             PIG.Session.ImagesSelection = [];
             PIG.Loader.UnassignedImages();
-            if(PIG.Session.CurrentAlbum)
+            if(PIG.Session.CurrentAlbum > 0)
                 PIG.Populator.Album(PIG.Session.CurrentAlbum["id"]);
         },
 
@@ -375,8 +377,11 @@ PIG.Action.Selection.DeleteAll = function(){
         success: function(data, status, jqXHR){
             PIG.Session.ImagesSelection = [];
             PIG.Loader.UnassignedImages();
-            if(PIG.Session.CurrentAlbum)
+            if(PIG.Session.CurrentAlbum > 0)
                 PIG.Populator.Album(PIG.Session.CurrentAlbum["id"]);
+            else
+                PIG.Loader.UnassignedImages();
+
         },
 
         error: function(jqXHR, status, error){
@@ -436,12 +441,12 @@ PIG.UIManager.ActionBar = function(){
     else if(PIG.Session.ImagesSelection.length > 0) {
         msg.text("Selected " + (PIG.Session.ImagesSelection.length) + " images");
         selectActions.show();
-        if(!PIG.Session.CurrentAlbum)
+        if(PIG.Session.CurrentAlbum <= 0 )
             selectActions.find("[data-pig-action-inalbum]").hide();
         else
             selectActions.find("[data-pig-action-inalbum]").show();
     }
-    else if(PIG.Session.CurrentAlbum != null)
+    else if(PIG.Session.CurrentAlbum > 0)
         msg.text("Drag images everywhere to upload into " + PIG.Session.CurrentAlbum["name"]);
     else
         msg.text("Drag images everywhere to upload");
@@ -519,7 +524,7 @@ PIG.UIManager.AlbumDetail = function(){
 }
 PIG.UIManager.UnassignedImages = function(){
     //Session update
-    PIG.Session.CurrentAlbum = null;
+    PIG.Session.CurrentAlbum = -1;
 
     //Breadcrumb
     var breadcrumbs = $(PIG.Conf.default_zones.header).find(".breadcrumb");
@@ -778,6 +783,8 @@ PIG.Loader.UnassignedImages = function(){
                 bt.hide();
             }
             PIG.Session.NoAlbumImages = data;
+            if(PIG.Session.CurrentAlbum == -1)
+                PIG.Populator.UnassignedImages();
         },
         error: function(jqXHR, status, error){
             console.log(jqXHR)

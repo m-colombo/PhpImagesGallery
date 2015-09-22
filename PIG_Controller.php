@@ -285,8 +285,8 @@ class PIG_Controller {
             foreach($res as $r)
                 $filenames[] = $r[0];
 
-            $query2 = $this->db->query("DELETE FROM ".($CONF["tables"]["pig_images"])." WHERE id in (-".(implode(',', $neg)).")");
-            $query3 = $this->db->query("DELETE FROM ".($CONF["tables"]["pig_album_images"])." WHERE image in (-".(implode(',', $neg)).")");
+            $query2 = $this->db->query("DELETE FROM ".($CONF["tables"]["pig_images"])." WHERE id in (-".(implode(',-', $neg)).")");
+            $query3 = $this->db->query("DELETE FROM ".($CONF["tables"]["pig_album_images"])." WHERE image in (-".(implode(',-', $neg)).")");
 
             if($query2 !== false && $query3 !== false){
                 foreach($filenames as $f){

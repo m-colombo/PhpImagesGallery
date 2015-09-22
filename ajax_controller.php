@@ -111,7 +111,8 @@ function processImageFromFile($tempFile)
     $dstWidth = $scale * $srcWidth;
     $dstHeight = $scale * $srcHeight;
     $image = new Imagick($tempFile["tmp_name"]);
-    $image->resizeImage($dstWidth, $dstHeight, imagick::FILTER_LANCZOS, 0.9);
+    if($scale != 1)
+        $image->resizeImage($dstWidth, $dstHeight, imagick::FILTER_LANCZOS, 0.9);   //TODO find a way to keep better quality
 
 
     //TODO make it safer, concurrent call?
@@ -131,10 +132,14 @@ function processImageFromFile($tempFile)
 
 
     /* Thumb */
-    if($srcWidth>$srcHeight)
-        $image->thumbnailImage($CONF["IMAGES_CONF"]["thumb_width"], 0);
-    else
-        $image->thumbnailImage(0, $CONF["IMAGES_CONF"]["thumb_height"]);
+    if($CONF["IMAGES_CONF"]["crop_thumb_to_fill"]){
+        $image->cropThumbnailImage($CONF["IMAGES_CONF"]["thumb_width"],$CONF["IMAGES_CONF"]["thumb_height"]);
+    }else{
+        if($srcWidth>$srcHeight)
+            $image->thumbnailImage($CONF["IMAGES_CONF"]["thumb_width"], 0);
+        else
+            $image->thumbnailImage(0, $CONF["IMAGES_CONF"]["thumb_height"]);
+    }
 
     $image->writeImage("./thumbnails/$dstName");
     $image->destroy();

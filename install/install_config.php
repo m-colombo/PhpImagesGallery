@@ -29,8 +29,9 @@ $INSTALL_CONFIG = array(
     "IMAGES_CONF" => array(
         "max_store_width" => 800,
         "max_store_height" => 600,
-        "thumb_width"  => 100,
-        "thumb_height"  => 100
+        "thumb_width"   => 100,
+        "thumb_height"  => 100,
+        "crop_thumb_to_fill" => true
     ),
 
     "ADMIN_PASSWORD" => "password",
