@@ -33,6 +33,10 @@ html {
   margin: 4em auto;
 }
 /* =================== Component styling =================== */
+
+.HiddenAlbum button{
+    background: lightgrey;
+}
 /* Image box */
 .PIGImage {
   position: relative;

@@ -179,6 +179,11 @@ require_once("include/user_login.php");
                             <textarea data-pig-edit-desc class="form-control" placeholder="Album description" ></textarea>
                         </div>
                     </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" data-pig-edit-visible> Is visible
+                        </label>
+                    </div>
                 </div>
                 <div class="modal-footer">
                 </div>

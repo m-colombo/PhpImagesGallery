@@ -264,7 +264,11 @@ PIG.Action.Album.UpdateInfo = function(album, modal){
     $.ajax(PIG.Conf.ajax_target+"?action=updateAlbumInfo&albumId="+album["id"], {
         method: "POST",
         data: {
-            info: {"name": album["name"], "description": album["description"]}   //Only this fields are supported so far TODO send only edits
+            info: {
+                "name": album["name"],
+                "description": album["description"],
+                "visible": album["visible"] ? 1 : 0
+            }   //Only this fields are supported so far TODO send only edits
         },
 
         success: function(data, status, jqXHR){
@@ -511,10 +515,13 @@ PIG.UIManager.AlbumDetail = function(){
         "<button type='button' class='btn btn-success' data-pig-action-save>Save</button>"
     )
 
+    m.find("[data-pig-edit-visible]")[0].checked = a["visible"] == 1
+
     !(function(){
         m.find("[data-pig-action-save]").on("click", function(){
             a["name"] = m.find("[data-pig-edit-name]")[0].value
             a["description"] = m.find("[data-pig-edit-desc]")[0].value
+            a["visible"] = m.find("[data-pig-edit-visible]")[0].checked
             PIG.Action.Album.UpdateInfo(a, m)
         })
         m.find("[data-pig-action-delete]").on("click", function(){
@@ -582,13 +589,15 @@ PIG.Populator.Albums = function(container){
                     })
                 })()
 
+                if(data[key]["visible"]==0)
+                    $(el).addClass("HiddenAlbum")
+
                 $(el).data("pig-album-id", data[key]["id"]);
                 $(el).find("[data-pig-album-name]").text(data[key]["name"]);
                 $(el).find("[data-pig-album-description]").text(data[key]["description"]);
                 if(data[key]["cover_filename"] != null )
                     $(el).find("[data-pig-thumb]").attr("src", "../thumbnails/" + data[key]["cover_filename"] );
 
-                //TODO link
 
                 $(container).append(el);
 

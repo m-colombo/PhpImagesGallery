@@ -76,7 +76,8 @@ if(array_key_exists("action", $_GET)){
     // Anonymous allowed action
     switch($_GET["action"]){
         case "getAlbums":
-            getAlbums();
+            $OnlyVisible = array_key_exists("OnlyVisible", $_GET) && $_GET["OnlyVisible"] == true;
+            getAlbums($OnlyVisible);
             break;
         case "getAlbumImages":
             getAlbumImages();
@@ -156,9 +157,9 @@ function processImageFromFile($tempFile)
 
 }
 
-function getAlbums(){
+function getAlbums($OnlyVisible=false){
     global $PIG;
-    $ret = $PIG->getAllAlbums();
+    $ret = $PIG->getAllAlbums($OnlyVisible);
 
     if($ret!==false)
         success($ret);

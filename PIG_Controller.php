@@ -43,14 +43,15 @@ class PIG_Controller {
      * array:
      *  id, create_date, name, description, cover_url (or null), cover_id (or null)
      */
-    public function getAllAlbums(){
+    public function getAllAlbums($OnlyVisible=false){
         global $CONF;
         $this->ERROR = null;
 
-        $result = $this->db->query("SELECT A.id as id, A.create_date as create_date, A.name as name, A.description as description, I.filename as cover_filename, I.id as cover_id
+        $result = $this->db->query("SELECT A.id as id, A.create_date as create_date, A.name as name, A.description as description, A.visible as visible, I.filename as cover_filename, I.id as cover_id
           FROM
               ".$CONF["tables"]["pig_albums"]." as A LEFT JOIN
               ".$CONF["tables"]["pig_images"]." as I ON I.id = A.cover
+          WHERE 1=1 ".($OnlyVisible?" AND A.visible=1":"")."
           ORDER BY A.weight");
 
 
@@ -469,7 +470,7 @@ class PIG_Controller {
         global $CONF;
         $this->ERROR = null;
 
-        $ALLOWED_FIELD = array("name", "description");
+        $ALLOWED_FIELD = array("name", "description", "visible");
 
         $setClause = "";
         $paramsValue = [];
@@ -491,7 +492,6 @@ class PIG_Controller {
         }
 
         $query = $this->db->prepare("UPDATE ".($CONF["tables"]["pig_albums"])." $setClause WHERE id = ?");
-
         $paramsValue[] = &$albumId;
         $paramsType .= "i";
 
