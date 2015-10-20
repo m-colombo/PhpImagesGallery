@@ -41,6 +41,10 @@
 
     $INSTALLED_CONF['LIBRARIES_ABS_PATH'] = $INSTALL_CONFIG["LIBRARIES_ABS_PATH"];
 
+    // Create directories
+    if(!mkdir("../images") || !mkdir("../thumbnails"))
+        die("<h2>Failed to create directories</h2>");
+
     // Check if tables already exists
     foreach ($INSTALL_CONFIG["TABLES_DEFINITION"] as $key => $val) {
         $result = $conn->query("SHOW TABLES LIKE '".($db_info["table_prefix"].$key)."'");
