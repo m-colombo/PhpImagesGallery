@@ -42,7 +42,7 @@
     $INSTALLED_CONF['LIBRARIES_ABS_PATH'] = $INSTALL_CONFIG["LIBRARIES_ABS_PATH"];
 
     // Create directories
-    if(!mkdir("../images") || !mkdir("../thumbnails"))
+    if(!mkdir("../images") || !mkdir("../thumbnails"))  //TODO right permission?
         die("<h2>Failed to create directories</h2>");
 
     // Check if tables already exists
@@ -68,6 +68,7 @@
 
     $INSTALLED_CONF["ADMIN_PASSWORD"] = $INSTALL_CONFIG["ADMIN_PASSWORD"];
     $INSTALLED_CONF["IMAGES_CONF"] = $INSTALL_CONFIG["IMAGES_CONF"];
+    $INSTALLED_CONF["PIG_VERSION"] = $INSTALL_CONFIG["PIV_VERSION"];
 
     //Store new config file
     if(file_put_contents("../config.php", '<?php $CONF='.var_export($INSTALLED_CONF, true)."; ?>") === false)

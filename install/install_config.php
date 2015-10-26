@@ -8,39 +8,40 @@
  */
 
 //TODO: FILL THIS ARRAY TO PROPERLY INSTALL PIG
-//TODO CLEAN
 $INSTALL_CONFIG = array(
 
     "DATABASE" => array(
         "host"          => "localhost",
         "user"          => "root",
         "password"      => "root",
-        "database"      => "test",
-        "table_prefix"  => "prefix"
+        "database"      => "PIG",
+        "table_prefix"  => ""
     ),
 
 
     //Path are relative to $_SERVER["DOCUMENT_ROOT"]
     "LIBRARIES_ABS_PATH" => array(
-        "bootstrap" =>  "/PIG/libs/bootstrap/", // Path to the bootstrap root folder, ends with directory separator /
-        "jquery"    =>  "/PIG/libs/jquery.min.js"  // Path to jquery file.
+        "bootstrap" =>  "", // Path to the bootstrap root folder, ends with directory separator /
+        "jquery"    =>  ""  // Path to jquery file.
     ),
 
     "IMAGES_CONF" => array(
-        "max_store_width" => 800,
-        "max_store_height" => 600,
-        "thumb_width"   => 100,
-        "thumb_height"  => 100,
+        "max_store_width" => 1600,
+        "max_store_height" => 1200,
+        "thumb_width"   => 250,
+        "thumb_height"  => 250,
         "crop_thumb_to_fill" => true
     ),
 
-    "ADMIN_PASSWORD" => "password",
+    "ADMIN_PASSWORD" => "oinkoink",
 
 
     ###################################
     #   LEAVE WHAT FOLLOWS AS IT IS   #
     ###################################
-    //TODO test and implement visible attribute
+
+    "PIG_VERSION" => "a0.1",
+
     "TABLES_DEFINITION" => array(
         "pig_images"        => "
             (
