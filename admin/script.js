@@ -566,7 +566,7 @@ PIG.Populator.Albums = function(container){
     if(container === undefined)
         container = $(PIG.Conf.default_zones.main);
 
-    var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2' data-pig-album-id='-1' onClick=''>" +
+    var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2' data-pig-album-id='' onClick=''>" +
         "<button class='btn btn-default thumbnail' data-pig-album-link>" +
         "<img src='"+(PIG.Conf.no_cover)+"' data-pig-thumb />" +
         "<h4 data-pig-album-name style='display: inline-block' ></h4><br/>" +
@@ -592,7 +592,7 @@ PIG.Populator.Albums = function(container){
                 if(data[key]["visible"]==0)
                     $(el).addClass("HiddenAlbum")
 
-                $(el).data("pig-album-id", data[key]["id"]);
+                $(el).attr("data-pig-album-id", data[key]["id"]);
                 $(el).find("[data-pig-album-name]").text(data[key]["name"]);
                 $(el).find("[data-pig-album-description]").text(data[key]["description"]);
                 if(data[key]["cover_filename"] != null )
