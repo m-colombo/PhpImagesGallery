@@ -169,6 +169,22 @@ PIG.Action.AlbumImage.UpdateInfo = function(image, modal){
     })
 }
 
+//TODO really unsafe way, concurrent call!
+PIG.Action.AlbumImage.SetOrder = function(sortedAlbumIds){
+    $.ajax(PIG.Conf.ajax_target+"?action=orderAlbum", {
+        method: "POST",
+        data: { sortedIds: sortedAlbumIds},
+        success: function(data, status, jqXHR){
+            PIG.Populator.Album(PIG.Session.CurrentAlbum["id"]);
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+            PIG.UIManager.Error("ERROR SORTING ALBUM", jqXHR);
+        }
+    })
+}
+
 PIG.Action.UnassignedImage.UpdateInfo = function(image, modal){
     modal.find("[data-pig-action-save]").append(" <span class='glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>")
     $.ajax(PIG.Conf.ajax_target+"?action=updateImageInfo&imageId="+image["id"], {
@@ -300,6 +316,22 @@ PIG.Action.Album.Delete = function(albumId, modal){
         complete: function(){
 
         }
+    })
+}
+
+//TODO really unsafe way, concurrent call!
+PIG.Action.Album.SetOrder = function(sortedAlbumIds){
+    $.ajax(PIG.Conf.ajax_target+"?action=orderAlbums", {
+        method: "POST",
+        data: { sortedIds: sortedAlbumIds},
+        success: function(data, status, jqXHR){
+            PIG.Populator.Albums();
+        },
+
+        error: function(jqXHR, status, error){
+            console.log(jqXHR);
+            PIG.UIManager.Error("ERROR SORTING ALBUMS", jqXHR);
+        },
     })
 }
 
@@ -608,6 +640,18 @@ PIG.Populator.Albums = function(container){
                     $(container).append("<div class='clearfix visible-sm-block'></div>");
                 if(count % 6 == 0)
                     $(container).append("<div class='clearfix visible-md-block visible-lg-block'></div>");
+
+                $(function() {
+                    $(container).sortable({
+                        cancel: "",
+                        cursor: "move",
+                        stop: function(event, ui){
+                            PIG.Action.Album.SetOrder($(container).sortable("toArray", {attribute: "data-pig-album-id"}).filter(function(el){return el != ""}))
+                        }
+                    });
+                    $(container ).disableSelection();
+
+                });
             }
         },
         error: function(jqXHR, status, error){
@@ -701,7 +745,7 @@ PIG.Populator.Album = function(albumId, container){
                     })
                 })()
 
-                $(el).data("pig-album-image-id", data[key]["id"]);
+                $(el).attr("data-pig-album-image-id", data[key]["id"]);
                 $(el).find("[data-pig-image-name]").text(data[key]["image_name"]);
                 $(el).find("[data-pig-image-description]").text(data[key]["image_description"] || "" );
                 $(el).find("[data-pig-thumb]").css("background-image", "url('../thumbnails/" + data[key]["filename"] +"')" );
@@ -719,6 +763,18 @@ PIG.Populator.Album = function(albumId, container){
                     $(container).append("<div class='clearfix visible-sm-block'></div>");
                 if(count % 6 == 0)
                     $(container).append("<div class='clearfix visible-md-block visible-lg-block'></div>");
+
+                $(function() {
+                    $(container).sortable({
+                        cancel: "",
+                        cursor: "move",
+                        stop: function(event, ui){
+                            PIG.Action.AlbumImage.SetOrder($(container).sortable("toArray", {attribute: "data-pig-album-image-id"}).filter(function(el){return el != ""}))
+                        }
+                    });
+                    $(container ).disableSelection();
+
+                });
             }
         },
         error: function(jqXHR, status, error){

@@ -531,4 +531,58 @@ class PIG_Controller {
 
         return true;
     }
+
+    public function setAlbumsOrder($sortedIds){
+        global $CONF;
+        $this->ERROR = null;
+
+        //Get albums count
+        $count = $this->db->query("SELECT COUNT(*) FROM ".($CONF["tables"]["pig_albums"]));
+        $count = $count->fetch_array()[0];
+
+        if(count($sortedIds) != $count){
+            $this->setError("DATA VALIDATION", "Invalid number of albums, sent ".(count($sortedIds))." request".$count);
+            return false;
+        }
+
+        $update = "";
+        for($i = 0; $i < $count; $i++)
+            $update .= ",($sortedIds[$i], $i)";
+        $update = substr($update, 1);
+
+        $query = "INSERT INTO ".($CONF["tables"]["pig_albums"])." (id, weight) VALUES $update ON DUPLICATE KEY UPDATE weight = VALUES(weight)";
+        if(!$this->db->query($query)){
+            $this->setError("QUERY", array("query" => $query, "error" => $this->db->error));
+            return false;
+        }
+
+        return true;
+    }
+
+    public function setAlbumOrder($sortedIds){
+        global $CONF;
+        $this->ERROR = null;
+
+        //Get albums count
+        $count = $this->db->query("SELECT COUNT(*) FROM ".($CONF["tables"]["pig_album_images"])." WHERE album IN (SELECT album FROM ".($CONF["tables"]["pig_album_images"])." WHERE id = $sortedIds[0])");
+        $count = $count->fetch_array()[0];
+
+        if(count($sortedIds) != $count){
+            $this->setError("DATA VALIDATION", "Invalid number of images, sent ".(count($sortedIds))." request".$count);
+            return false;
+        }
+
+        $update = "";
+        for($i = 0; $i < $count; $i++)
+            $update .= ",($sortedIds[$i], $i)";
+        $update = substr($update, 1);
+
+        $query = "INSERT INTO ".($CONF["tables"]["pig_album_images"])." (id, weight) VALUES $update ON DUPLICATE KEY UPDATE weight = VALUES(weight)";
+        if(!$this->db->query($query)){
+            $this->setError("QUERY", array("query" => $query, "error" => $this->db->error));
+            return false;
+        }
+
+        return true;
+    }
 }

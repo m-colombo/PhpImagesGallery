@@ -234,18 +234,4 @@ require_once("include/user_login.php");
 <script src="./include/dropzone/dropzone.min.js"></script>
 <script src="script.js"></script>
 
-<script>
-    $(function() {
-        $( "#main-content" ).sortable({
-            cancel: "",
-            cursor: "move",
-            stop: function(event, ui){
-                console.log("New order "+ $( "#main-content" ).sortable("toArray", {attribute: "data-pig-album-id"}).filter(function(el){return el != ""}))
-            }
-        });
-        $( "#main-content" ).disableSelection();
-        
-    });
-</script>
-
 </body>

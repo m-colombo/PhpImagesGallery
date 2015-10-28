@@ -67,6 +67,12 @@ if(array_key_exists("action", $_GET)){
             case "deleteAlbum":
                 deleteAlbum();
                 break;
+            case "orderAlbums":
+                orderAlbums();
+                break;
+            case "orderAlbum":
+                orderAlbum();
+                break;
             default:
                 $HasAdminActionMatched = false;
 
@@ -331,6 +337,37 @@ function updateAlbum(){
         $ret = $PIG->updateAlbumInfo($_GET["albumId"], $_POST["info"]);
     else
         error("No album id");
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+function orderAlbums(){
+    global $PIG;
+    $ret = false;
+
+    if(array_key_exists("sortedIds", $_POST)){
+        $ret = $PIG->setAlbumsOrder($_POST["sortedIds"]);
+    }else
+        error("No sorted ids");
+
+    if($ret!==false)
+        success($ret);
+    else
+        error($PIG->ERROR);
+}
+
+
+function orderAlbum(){
+    global $PIG;
+    $ret = false;
+
+    if(array_key_exists("sortedIds", $_POST)){
+        $ret = $PIG->setAlbumOrder($_POST["sortedIds"]);
+    }else
+        error("No sorted ids");
 
     if($ret!==false)
         success($ret);
