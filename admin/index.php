@@ -230,7 +230,7 @@ require_once("include/user_login.php");
 
 <script src="<?php echo $CONF["LIBRARIES_ABS_PATH"]["jquery"]; ?>"></script>
 <script src="<?php echo $CONF["LIBRARIES_ABS_PATH"]["bootstrap"]."js/bootstrap.min.js" ;?>"></script>
-<script src="../../../jquery-ui/jquery-ui.js" ;?>"></script>
+<script src="<?php echo $CONF["LIBRARIES_ABS_PATH"]["jquery-ui"]."/jquery-ui.min.js" ;?>"></script>
 <script src="./include/dropzone/dropzone.min.js"></script>
 <script src="script.js"></script>
 

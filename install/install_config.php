@@ -22,7 +22,8 @@ $INSTALL_CONFIG = array(
     //Path are relative to $_SERVER["DOCUMENT_ROOT"]
     "LIBRARIES_ABS_PATH" => array(
         "bootstrap" =>  "", // Path to the bootstrap root folder, ends with directory separator /
-        "jquery"    =>  ""  // Path to jquery file.
+        "jquery"    =>  "",  // Path to jquery file.
+        "jquery-ui"    =>  ""  // Path to jquery root folder, ends with directory separator /.
     ),
 
     "IMAGES_CONF" => array(

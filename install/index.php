@@ -39,6 +39,9 @@
     if(!file_exists($_SERVER["DOCUMENT_ROOT"].$INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["jquery"]))
         die("<h2>JQuery not found</h2> at path: ".$_SERVER["DOCUMENT_ROOT"].$INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["jquery"]);
 
+    if(!file_exists($_SERVER["DOCUMENT_ROOT"].$INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["jquery-ui"]))
+        die("<h2>JQuery UI not found</h2> at path: ".$_SERVER["DOCUMENT_ROOT"].$INSTALL_CONFIG["LIBRARIES_ABS_PATH"]["jquery-ui"]);
+
     $INSTALLED_CONF['LIBRARIES_ABS_PATH'] = $INSTALL_CONFIG["LIBRARIES_ABS_PATH"];
 
     // Create directories
