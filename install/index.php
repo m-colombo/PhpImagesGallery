@@ -45,7 +45,7 @@
     $INSTALLED_CONF['LIBRARIES_ABS_PATH'] = $INSTALL_CONFIG["LIBRARIES_ABS_PATH"];
 
     // Create directories
-    if(!mkdir("../images") || !mkdir("../thumbnails"))  //TODO right permission?
+    if(!mkdir("../images", 0755) || !mkdir("../thumbnails", 0755))
         die("<h2>Failed to create directories</h2>");
 
     // Check if tables already exists
