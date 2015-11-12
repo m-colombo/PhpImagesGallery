@@ -77,6 +77,7 @@
     if(file_put_contents("../config.php", '<?php $CONF='.var_export($INSTALLED_CONF, true)."; ?>") === false)
         die('<h2>Failed to write config file</h2>NOT HANDLED: you have to clean db by your own');
 
+    clearstatcache();
     die("<h2>Installation successful</h2> <a href='../'>Go to admin panel</a>");
 
 ?>
