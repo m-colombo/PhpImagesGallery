@@ -120,7 +120,7 @@ class PIG_Controller {
     public function getAlbumImages($id){
         global $CONF;
         $this->ERROR = null;
-        $ret = false;
+        $ret = [];
 
         if(!is_numeric(($id))){
             $this->setError("DATA VALIDATION", "Non numeric id");
