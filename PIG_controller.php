@@ -122,28 +122,29 @@ class PIG_Controller {
         $this->ERROR = null;
         $ret = false;
 
+        if(!is_numeric(($id))){
+            $this->setError("DATA VALIDATION", "Non numeric id");
+            return false;
+        }
 
-        $query = $this->db->prepare("SELECT AI.*, filename, width, height FROM
+        $result = $this->db->query("SELECT AI.*, filename, width, height FROM
           ".$CONF["tables"]["pig_album_images"]." as AI JOIN
           ".$CONF["tables"]["pig_images"]." as I ON
             I.id = AI.image
-          WHERE AI.album = ?
+          WHERE AI.album = $id
           ORDER BY AI.weight
           ");
 
-        $query->bind_param("i", $id);
 
-        if($query->execute()) {
-            $result = $query->get_result();
-            $ret = array();
-            while($row = $result->fetch_assoc())
-                $ret[] = $row;
+        if($result !== false) {
+                while($row = $result->fetch_assoc())
+                    $ret[] = $row;
 
         }else{
-            $this->setError("QUERY", $query->error);
+            $this->setError("QUERY", $this->db->error);
         }
 
-        $query->close();
+        $result->close();
         return $ret;
     }
 
