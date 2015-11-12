@@ -155,7 +155,7 @@ PIG.Action.AlbumImage.UpdateInfo = function(image, modal){
         success: function(data, status, jqXHR){
             modal.modal("hide")
             //TODO avoid reloading all the images
-            PIG.Populator.Album(PIG.Session.CurrentAlbum);
+            PIG.Populator.Album(PIG.Session.CurrentAlbum["id"]);
         },
 
         error: function(jqXHR, status, error){
@@ -601,8 +601,8 @@ PIG.Populator.Albums = function(container){
     var layout = "<div class='col-xs-4 col-sm-3 col-md-2 col-lg-2' data-pig-album-id='' onClick=''>" +
         "<button class='btn btn-default thumbnail' data-pig-album-link>" +
         "<img src='"+(PIG.Conf.no_cover)+"' data-pig-thumb />" +
-        "<h4 data-pig-album-name style='display: inline-block' ></h4><br/>" +
-        "<span data-pig-album-description style='display: inline-block; '><span>" +
+        "<h4 data-pig-album-name style='display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;' ></h4><br/>" +
+        "<span data-pig-album-description style='display: inline-block;white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 200px '><span>" +
         "</button></div>";
 
     //Get data
