@@ -314,7 +314,7 @@ PIG.Action.Album.Delete = function(albumId, modal){
         method: "GET",
         success: function(data, status, jqXHR){
             modal.modal("hide")
-            PIG.Populator.Albums();
+            PIG.UIManager.Albums();
         },
 
         error: function(jqXHR, status, error){

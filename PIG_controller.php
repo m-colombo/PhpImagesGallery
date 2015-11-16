@@ -70,6 +70,46 @@ class PIG_Controller {
     }
 
     /**
+     * @return array|bool
+     * array:
+     *  id, create_date, name, description, cover_url (or null), cover_id (or null)
+     */
+    public function getAlbums($ids){
+        global $CONF;
+        $this->ERROR = null;
+
+        foreach($ids as $id)
+            if(!is_numeric($id)){
+                $this->setError("DATA VALIDATION", "Non numeric id "+id);
+                return false;
+            }
+
+        $ids_str = "(".implode(",", $ids).")";
+
+
+        $result = $this->db->query("SELECT A.id as id, A.create_date as create_date, A.name as name, A.description as description, A.visible as visible, I.filename as cover_filename, I.id as cover_id
+          FROM
+              ".$CONF["tables"]["pig_albums"]." as A LEFT JOIN
+              ".$CONF["tables"]["pig_images"]." as I ON I.id = A.cover
+          WHERE A.id in $ids_str
+          ORDER BY A.weight");
+
+
+        if(!$result){
+            $this->setError("QUERY", $this->db->error);
+            return false;
+        }
+
+        $ret = array();
+
+        while($row = $result->fetch_assoc())
+            $ret[] = $row;
+
+
+        return $ret;
+    }
+
+    /**
      * @param $name
      * @param $desc
      * @param int $order
