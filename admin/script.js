@@ -98,6 +98,10 @@ PIG.Action.Image.ShowDetail = function(image){
         m.find(".modal-body").append("<input type='text' data-pig-edit-name value='" + (image["image_name"]) + "' placeholder='Image name' /><br/>")
         m.find(".modal-body").append("<input type='text' data-pig-edit-desc placeholder='Image description' value='" + (image["image_description"] || "") + "' />")
 
+        m.find(".modal-body").append(
+            "<br/><span style='font-size: 0.7em'>Album id: " + image["album"] + " - ImageAlbum id: " + image["id"] + " - Image id: " + image["image"] +  "</span>"
+        );
+
         m.find(".modal-footer").empty()
         m.find(".modal-footer").append(
             "<button type='button' class='btn btn-warning pull-left' data-pig-action-remove>Remove from album</button>" +
@@ -122,6 +126,11 @@ PIG.Action.Image.ShowDetail = function(image){
         //UnAssigned Image
         m.find(".modal-title").text(image["name"]);
         m.find(".modal-body").append("<input type='text' data-pig-edit-name value='" + (image["name"]) + "' placeholder='Image name' /><br/>")
+
+        m.find(".modal-body").append(
+            "<span style='font-size: 0.7em'>Image id: " + image["id"]+ "</span>"
+        );
+
 
         m.find(".modal-footer").empty()
         m.find(".modal-footer").append(
@@ -516,7 +525,7 @@ PIG.UIManager.Album = function(albumData){
     var breadcrumbs = $(PIG.Conf.default_zones.header).find(".breadcrumb");
     breadcrumbs.hide();
     var albumBC = breadcrumbs.filter("[data-pig-breadcrumb-album]");
-    $(albumBC).find("[data-pig-breadcrumb-album-name]").text(albumData["name"]);
+    $(albumBC).find("[data-pig-breadcrumb-album-name]").text(albumData["name"] + " (id: "+albumData["id"]+")");
     albumBC.show();
 
     //Action
