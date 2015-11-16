@@ -241,7 +241,7 @@ PIG.Action.AlbumImage.Remove = function(id, modal){
         success: function(data, status, jqXHR){
             modal.modal("hide")
             //TODO avoid reloading all the images, if no images left write something
-            PIG.Populator.Album(PIG.Session.CurrentAlbum);
+            PIG.Populator.Album(PIG.Session.CurrentAlbum["id"]);
             PIG.Loader.UnassignedImages()
         },
 
