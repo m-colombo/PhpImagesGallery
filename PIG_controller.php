@@ -39,6 +39,7 @@ class PIG_Controller {
     }
 
     /**
+     * TODO add images count
      * @return array|bool
      * array:
      *  id, create_date, name, description, cover_url (or null), cover_id (or null)
@@ -80,7 +81,7 @@ class PIG_Controller {
 
         foreach($ids as $id)
             if(!is_numeric($id)){
-                $this->setError("DATA VALIDATION", "Non numeric id "+id);
+                $this->setError("DATA VALIDATION", "Non numeric id ".id);
                 return false;
             }
 
